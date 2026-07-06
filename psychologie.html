@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seimei &mdash; Branche Psychologique | Sunagakure</title>
+<style>
+@import url('vendor/fonts.css');
+:root{
+  --sand-1:#f4e4c1;--sand-deep:#c89b5e;--ocre:#b5712b;--ocre-deep:#8a4f1a;
+  --rust:#7a3b15;--parchment:#f0dfb8;--chakra:#6fcf97;--chakra-glow:#3ddc84;
+  --blood-light:#c4453a;--gold:#ffd86b;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Cormorant Garamond',serif;color:var(--parchment);min-height:100vh;overflow-x:hidden;
+  background:radial-gradient(ellipse at 50% -10%,#5a3d1e 0%,transparent 55%),
+    linear-gradient(160deg,#2e1d0c 0%,#1c1106 60%,#140c04 100%);}
+body::before{content:"";position:fixed;inset:0;opacity:.05;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  z-index:1;}
+.wrap{position:relative;z-index:2;max-width:900px;margin:0 auto;padding:28px 16px 80px;}
+.back-btn{text-align:right;margin-bottom:8px;}
+.back-btn a{font-family:'Cinzel',serif;font-weight:700;font-size:.82rem;letter-spacing:.05em;
+  padding:8px 16px;border:1px solid var(--ocre);border-radius:9px;color:var(--sand-1);
+  text-decoration:none;text-transform:uppercase;transition:.2s;}
+.back-btn a:hover{background:rgba(181,113,43,.2);}
+header{text-align:center;margin-bottom:24px;}
+.crest{width:64px;height:64px;margin:0 auto 10px;border:3px solid var(--ocre);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle,rgba(181,113,43,.25),transparent 70%);
+  box-shadow:0 0 24px rgba(181,113,43,.35);}
+.crest svg{width:36px;height:36px;}
+h1{font-family:'Cinzel',serif;font-weight:900;font-size:clamp(1.5rem,4.5vw,2.3rem);
+  letter-spacing:.06em;color:var(--sand-1);text-shadow:0 2px 0 var(--rust),0 0 28px rgba(181,113,43,.5);}
+.sub{font-size:1.1rem;color:var(--sand-deep);font-style:italic;margin-top:4px;}
+.intro{font-size:1.08rem;line-height:1.55;text-align:center;color:var(--parchment);max-width:740px;margin:14px auto 0;}
+.divider{height:2px;width:58%;margin:14px auto 0;background:linear-gradient(90deg,transparent,var(--ocre),transparent);}
+
+.panel{background:linear-gradient(160deg,rgba(240,223,184,.07),rgba(60,41,20,.15));
+  border:1px solid rgba(181,113,43,.45);border-radius:14px;padding:22px 22px 22px 26px;margin-bottom:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,.45);border-left:5px solid var(--ocre);}
+.panel h2{font-family:'Cinzel',serif;font-weight:700;color:var(--ocre);font-size:1.18rem;
+  letter-spacing:.05em;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.panel h2::before{content:"";width:7px;height:7px;background:var(--ocre);transform:rotate(45deg);}
+
+.panel-definition{border-left-color:var(--sand-deep);}
+.panel-definition h2{color:var(--sand-deep);}
+.panel-definition h2::before{background:var(--sand-deep);}
+
+.panel-types{border-left-color:var(--chakra);}
+.panel-types h2{color:var(--chakra);}
+.panel-types h2::before{background:var(--chakra);}
+
+.panel-principales{border-left-color:var(--ocre);}
+
+.panel-blessures{border-left-color:var(--blood-light);}
+.panel-blessures h2{color:var(--blood-light);}
+.panel-blessures h2::before{background:var(--blood-light);}
+
+.panel-protocole{border-left-color:var(--gold);}
+.panel-protocole h2{color:var(--gold);}
+.panel-protocole h2::before{background:var(--gold);}
+
+.panel-reeduc{border-left-color:var(--chakra-glow);}
+.panel-reeduc h2{color:var(--chakra-glow);}
+.panel-reeduc h2::before{background:var(--chakra-glow);}
+
+.section-num{font-family:'Cinzel',serif;font-weight:900;font-size:.75rem;letter-spacing:.08em;
+  padding:3px 10px;border-radius:6px;text-transform:uppercase;margin-bottom:6px;display:inline-block;}
+.section-num-sand{background:rgba(200,155,94,.15);border:1px solid rgba(200,155,94,.4);color:var(--sand-deep);}
+.section-num-green{background:rgba(61,220,132,.12);border:1px solid rgba(61,220,132,.4);color:var(--chakra);}
+.section-num-orange{background:rgba(181,113,43,.2);border:1px solid rgba(181,113,43,.5);color:var(--ocre);}
+.section-num-red{background:rgba(196,69,58,.2);border:1px solid rgba(196,69,58,.5);color:var(--blood-light);}
+.section-num-gold{background:rgba(255,216,107,.15);border:1px solid rgba(255,216,107,.5);color:var(--gold);}
+.section-num-teal{background:rgba(61,220,132,.12);border:1px solid rgba(61,220,132,.4);color:var(--chakra-glow);}
+
+.lead{font-size:1.08rem;line-height:1.55;}
+
+.comp-list{list-style:none;margin:12px 0 0;padding:0;}
+.comp-list li{position:relative;padding:8px 0 8px 20px;font-size:1.05rem;line-height:1.5;
+  border-bottom:1px solid rgba(181,113,43,.15);}
+.comp-list li:last-child{border-bottom:none;}
+.comp-list li::before{content:"\25C6";position:absolute;left:0;top:8px;color:var(--sand-deep);font-size:.6rem;}
+.comp-list li strong{color:var(--sand-1);}
+
+.cards-row{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:14px;}
+.type-card{background:rgba(20,12,4,.45);border:1px solid rgba(181,113,43,.3);border-radius:10px;
+  padding:16px;text-align:center;transition:.2s;}
+.type-card:hover{border-color:var(--ocre);background:rgba(20,12,4,.6);}
+.type-card h3{font-family:'Cinzel',serif;font-weight:700;font-size:1rem;color:var(--sand-1);
+  margin-bottom:6px;letter-spacing:.03em;}
+.type-card .card-sub{font-size:.88rem;color:var(--sand-deep);font-style:italic;margin-bottom:8px;}
+.type-card p{font-size:1rem;line-height:1.45;color:var(--parchment);}
+.type-card .card-tag{display:inline-block;font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:.06em;
+  padding:2px 9px;border-radius:5px;text-transform:uppercase;margin-top:8px;}
+.card-mobile .card-tag{background:rgba(61,220,132,.12);border:1px solid rgba(61,220,132,.4);color:var(--chakra);}
+.card-semi .card-tag{background:rgba(255,216,107,.15);border:1px solid rgba(255,216,107,.5);color:var(--gold);}
+.card-fixe .card-tag{background:rgba(196,69,58,.15);border:1px solid rgba(196,69,58,.4);color:#ffcaa0;}
+
+.body-list{list-style:none;margin:12px 0 0;padding:0;}
+.body-list li{position:relative;padding:12px 14px 12px 52px;font-size:1.05rem;line-height:1.5;
+  border-bottom:1px solid rgba(181,113,43,.15);color:var(--parchment);}
+.body-list li:last-child{border-bottom:none;}
+.body-list li strong{color:var(--sand-1);font-size:1.08rem;}
+.body-icon{position:absolute;left:10px;top:10px;width:30px;height:30px;border-radius:50%;
+  background:rgba(181,113,43,.2);border:1.5px solid rgba(181,113,43,.5);
+  display:flex;align-items:center;justify-content:center;font-size:.85rem;}
+
+.injury-panel{background:rgba(20,12,4,.4);border:1px solid rgba(181,113,43,.25);border-radius:10px;
+  padding:16px 18px;margin-top:14px;}
+.injury-panel h3{font-family:'Cinzel',serif;font-weight:700;font-size:1.05rem;color:var(--sand-1);
+  margin-bottom:8px;letter-spacing:.03em;}
+
+.warn-box{display:flex;align-items:flex-start;gap:10px;margin-top:12px;padding:10px 14px;
+  border-radius:9px;font-size:.98rem;line-height:1.45;
+  background:rgba(196,69,58,.12);border:1px solid rgba(196,69,58,.45);color:#ffcaa0;}
+.warn-box svg{flex-shrink:0;width:20px;height:20px;margin-top:2px;color:var(--blood-light);}
+
+.info-box{display:flex;align-items:flex-start;gap:10px;margin-top:12px;padding:10px 14px;
+  border-radius:9px;font-size:.98rem;line-height:1.45;
+  background:rgba(91,155,213,.1);border:1px solid rgba(91,155,213,.35);color:#a8cce8;}
+.info-box svg{flex-shrink:0;width:20px;height:20px;margin-top:2px;color:#7db8e8;}
+
+.steps{list-style:none;margin:10px 0;padding:0;counter-reset:step-counter;}
+.steps li{position:relative;padding:8px 0 8px 48px;font-size:1.05rem;line-height:1.5;
+  color:var(--parchment);counter-increment:step-counter;
+  border-bottom:1px solid rgba(181,113,43,.1);}
+.steps li:last-child{border-bottom:none;}
+.steps li::before{content:counter(step-counter);position:absolute;left:0;top:6px;
+  width:30px;height:30px;border-radius:50%;
+  background:linear-gradient(160deg,var(--ocre),var(--ocre-deep));
+  color:#fff5e6;font-family:'Cinzel',serif;font-weight:900;font-size:.85rem;
+  display:flex;align-items:center;justify-content:center;line-height:1;
+  box-shadow:0 2px 0 var(--rust);}
+.steps li strong{color:var(--sand-1);}
+
+.reeduc-list{list-style:none;margin:10px 0 0;padding:0;}
+.reeduc-list li{position:relative;padding:8px 0 8px 24px;font-size:1.05rem;line-height:1.5;
+  border-bottom:1px solid rgba(61,220,132,.12);}
+.reeduc-list li:last-child{border-bottom:none;}
+.reeduc-list li::before{content:"\25B8";position:absolute;left:6px;top:9px;color:var(--chakra-glow);font-size:.9rem;}
+.reeduc-list li strong{color:var(--chakra);}
+
+footer{text-align:center;margin-top:30px;color:var(--sand-deep);font-style:italic;}
+footer .seal{color:var(--ocre);font-family:'Cinzel',serif;}
+
+@media(max-width:700px){
+  .cards-row{grid-template-columns:1fr;}
+  .body-list li{padding-left:46px;}
+}
+@media(max-width:480px){
+  .panel{padding:16px 14px 16px 18px;}
+  .steps li{padding-left:40px;}
+  .steps li::before{width:26px;height:26px;font-size:.78rem;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="back-btn"><a href="index.html">&larr; Retour au hub</a></div>
+  <header>
+    <div class="crest"><svg viewBox="0 0 100 100" fill="none">
+      <circle cx="50" cy="50" r="30" stroke="#b5712b" stroke-width="4"/>
+      <path d="M50 22 L58 44 L50 50 L42 44 Z" fill="#b5712b"/>
+      <path d="M50 78 L42 56 L50 50 L58 56 Z" fill="#b5712b"/>
+      <circle cx="50" cy="50" r="6" fill="#8a4f1a"/>
+    </svg></div>
+    <h1>Branche Psychologique</h1>
+    <div class="sub">Section M&eacute;dicale Seimei &middot; Sunagakure</div>
+    <div class="divider"></div>
+    <p class="intro">Le corps n&rsquo;est pas la seule victime de la guerre. Le psychologue de la Seimei prend en charge les blessures invisibles des shinobi&nbsp;: traumatismes de combat, genjutsu, deuil et &eacute;puisement. Un esprit stable est aussi vital qu&rsquo;un corps soign&eacute;.</p>
+  </header>
+
+  <!-- ============================================================ -->
+  <!-- 1. RÔLE DU PSYCHOLOGUE -->
+  <!-- ============================================================ -->
+  <div class="panel panel-definition">
+    <span class="section-num section-num-sand">1 &mdash; R&ocirc;le</span>
+    <h2>Le r&ocirc;le du psychologue dans la Seimei</h2>
+    <p class="lead">Le psychologue accompagne les shinobi avant, pendant et apr&egrave;s les missions&nbsp;:</p>
+    <ul class="comp-list">
+      <li><strong>&Eacute;valuation</strong> de l&rsquo;&eacute;tat mental avant un retour en service actif</li>
+      <li><strong>Soutien</strong> imm&eacute;diat apr&egrave;s une mission traumatisante</li>
+      <li><strong>Suivi</strong> r&eacute;gulier des shinobi expos&eacute;s &agrave; des situations extr&ecirc;mes</li>
+      <li>Coordination avec les gradés m&eacute;dicaux en cas de somatisation (douleurs physiques d&rsquo;origine psychique)</li>
+    </ul>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- 2. TROUBLES FRÉQUENTS CHEZ LE SHINOBI -->
+  <!-- ============================================================ -->
+  <div class="panel panel-types">
+    <span class="section-num section-num-green">2 &mdash; Troubles</span>
+    <h2>Troubles fr&eacute;quents chez le shinobi</h2>
+    <div class="cards-row">
+      <div class="type-card card-fixe">
+        <h3>Stress post-traumatique</h3>
+        <div class="card-sub">SSPT</div>
+        <p>Reviviscences, cauchemars, hypervigilance apr&egrave;s un combat ou une perte violente.</p>
+      </div>
+      <div class="type-card card-semi">
+        <h3>Dissociation post-genjutsu</h3>
+        <div class="card-sub">Rupture du r&eacute;el</div>
+        <p>Confusion, d&eacute;tachement de la r&eacute;alit&eacute; apr&egrave;s une illusion prolong&eacute;e ou violente.</p>
+      </div>
+      <div class="type-card card-mobile">
+        <h3>Deuil traumatique</h3>
+        <div class="card-sub">Perte</div>
+        <p>Perte d&rsquo;un co&eacute;quipier en mission &mdash; deuil compliqu&eacute; par la culpabilit&eacute; du survivant.</p>
+      </div>
+      <div class="type-card card-fixe">
+        <h3>&Eacute;puisement chronique</h3>
+        <div class="card-sub">Burnout</div>
+        <p>Sur-sollicitation en chakra et en missions &mdash; fatigue mentale profonde, perte de motivation.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- 3. L'ENTRETIEN CLINIQUE -->
+  <!-- ============================================================ -->
+  <div class="panel panel-principales">
+    <span class="section-num section-num-orange">3 &mdash; Entretien</span>
+    <h2>L&rsquo;entretien clinique</h2>
+    <ul class="comp-list">
+      <li><strong>&Eacute;coute active</strong> &mdash; laisser parler sans interrompre, reformuler pour montrer la compr&eacute;hension</li>
+      <li><strong>Questions ouvertes</strong> &mdash; &eacute;viter les questions ferm&eacute;es qui bloquent le r&eacute;cit</li>
+      <li><strong>Observation non-verbale</strong> &mdash; posture, regard fuyant, tremblements, silence prolong&eacute;</li>
+      <li><strong>Cadre de confiance</strong> &mdash; un lieu calme, sans jugement, sans urgence impos&eacute;e</li>
+      <li><strong>Rep&eacute;rage des signaux d&rsquo;alerte</strong> &mdash; id&eacute;es noires, isolement soudain, prise de risques inhabituelle</li>
+    </ul>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- 4. TECHNIQUES DE SOUTIEN -->
+  <!-- ============================================================ -->
+  <div class="panel panel-protocole">
+    <span class="section-num section-num-gold">4 &mdash; Soutien</span>
+    <h2>Techniques de soutien</h2>
+    <ol class="steps">
+      <li><strong>D&eacute;samor&ccedil;age post-mission</strong> &mdash; entretien court juste apr&egrave;s un &eacute;v&eacute;nement difficile, avant que le choc ne s&rsquo;installe</li>
+      <li><strong>Ancrage &amp; respiration</strong> &mdash; techniques de retour au calme pour g&eacute;rer une crise d&rsquo;angoisse</li>
+      <li><strong>Verbalisation encadr&eacute;e</strong> &mdash; aider le shinobi &agrave; mettre des mots sur ce qu&rsquo;il a v&eacute;cu</li>
+      <li><strong>Th&eacute;rapie brève</strong> &mdash; suivi cibl&eacute; sur quelques s&eacute;ances pour un trouble pr&eacute;cis</li>
+    </ol>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- 5. GESTION DE CRISE -->
+  <!-- ============================================================ -->
+  <div class="panel panel-blessures">
+    <span class="section-num section-num-red">5 &mdash; Crise</span>
+    <h2>Gestion de crise</h2>
+
+    <div class="injury-panel">
+      <h3>Crise d&rsquo;angoisse</h3>
+      <p style="font-size:1.02rem;line-height:1.5;color:var(--parchment);">Respiration rapide, oppression, sensation de perte de contr&ocirc;le. Isoler la personne, parler calmement, guider la respiration.</p>
+    </div>
+
+    <div class="injury-panel">
+      <h3>Id&eacute;es noires / suicidaires</h3>
+      <p style="font-size:1.02rem;line-height:1.5;color:var(--parchment);">Prendre au s&eacute;rieux tout propos, m&ecirc;me all&eacute;g&eacute;. Ne jamais laisser la personne seule, alerter imm&eacute;diatement un gradé.</p>
+      <div class="warn-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>Situation d&rsquo;urgence absolue &mdash; ne jamais g&eacute;rer seul, toujours en r&eacute;f&eacute;rer &agrave; un grad&eacute; imm&eacute;diatement.</span>
+      </div>
+    </div>
+
+    <div class="injury-panel">
+      <h3>D&eacute;compensation en mission</h3>
+      <p style="font-size:1.02rem;line-height:1.5;color:var(--parchment);">Perte de moyens soudaine sur le terrain (panique, dissociation). Mettre en s&eacute;curit&eacute;, retirer de la mission, r&eacute;&eacute;valuer avant tout retour en service.</p>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- 6. CONFIDENTIALITÉ & ÉTHIQUE -->
+  <!-- ============================================================ -->
+  <div class="panel panel-definition">
+    <span class="section-num section-num-sand">6 &mdash; &Eacute;thique</span>
+    <h2>Confidentialit&eacute; &amp; &eacute;thique</h2>
+    <ul class="comp-list">
+      <li><strong>Secret professionnel</strong> &mdash; ce qui est dit en entretien reste confidentiel</li>
+      <li><strong>Limite au secret</strong> &mdash; en cas de danger imm&eacute;diat pour le patient ou pour autrui, signalement obligatoire au g&eacute;rant</li>
+      <li><strong>Neutralit&eacute;</strong> &mdash; ne jamais juger les actes commis en mission, se concentrer sur l&rsquo;&eacute;tat mental</li>
+    </ul>
+    <div class="info-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      <span>La confiance est l&rsquo;outil principal du psychologue &mdash; la briser sans raison grave d&eacute;truit toute possibilit&eacute; de suivi futur.</span>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- 7. SUIVI À LONG TERME -->
+  <!-- ============================================================ -->
+  <div class="panel panel-reeduc">
+    <span class="section-num section-num-teal">7 &mdash; Suivi</span>
+    <h2>Suivi &agrave; long terme</h2>
+    <ul class="reeduc-list">
+      <li>Bilans r&eacute;guliers apr&egrave;s un &eacute;v&eacute;nement marquant</li>
+      <li>Orientation vers la Seimei m&eacute;dicale si des sympt&ocirc;mes physiques persistent (somatisation)</li>
+      <li>R&eacute;int&eacute;gration progressive au service actif, jamais impos&eacute;e</li>
+      <li>Coordination avec la hi&eacute;rarchie pour ajuster la charge de mission si n&eacute;cessaire</li>
+    </ul>
+  </div>
+
+  <footer>Outil p&eacute;dagogique officiel &middot; <span class="seal">Seimei</span> &middot; Sunagakure</footer>
+</div>
+</body>
+</html>
