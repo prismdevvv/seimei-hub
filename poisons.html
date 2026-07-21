@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seimei &mdash; Registre des Poisons | Sunagakure</title>
+<style>
+@import url('vendor/fonts.css');
+:root{
+  --sand-1:#f4e4c1;--sand-deep:#c89b5e;--ocre:#b5712b;--ocre-deep:#8a4f1a;
+  --rust:#7a3b15;--parchment:#f0dfb8;--chakra:#6fcf97;--chakra-glow:#3ddc84;
+  --blood-light:#c4453a;--gold:#ffd86b;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Cormorant Garamond',serif;color:var(--parchment);min-height:100vh;overflow-x:hidden;
+  background:radial-gradient(ellipse at 50% -10%,#5a3d1e 0%,transparent 55%),
+    linear-gradient(160deg,#2e1d0c 0%,#1c1106 60%,#140c04 100%);}
+body::before{content:"";position:fixed;inset:0;opacity:.05;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  z-index:1;}
+.wrap{position:relative;z-index:2;max-width:900px;margin:0 auto;padding:28px 16px 80px;}
+.back-btn{text-align:right;margin-bottom:8px;}
+.back-btn a{font-family:'Cinzel',serif;font-weight:700;font-size:.82rem;letter-spacing:.05em;
+  padding:8px 16px;border:1px solid var(--ocre);border-radius:9px;color:var(--sand-1);
+  text-decoration:none;text-transform:uppercase;transition:.2s;}
+.back-btn a:hover{background:rgba(181,113,43,.2);}
+header{text-align:center;margin-bottom:24px;}
+.crest{width:64px;height:64px;margin:0 auto 10px;border:3px solid var(--ocre);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle,rgba(181,113,43,.25),transparent 70%);
+  box-shadow:0 0 24px rgba(181,113,43,.35);}
+.crest svg{width:36px;height:36px;}
+h1{font-family:'Cinzel',serif;font-weight:900;font-size:clamp(1.5rem,4.5vw,2.3rem);
+  letter-spacing:.06em;color:var(--sand-1);text-shadow:0 2px 0 var(--rust),0 0 28px rgba(181,113,43,.5);}
+.sub{font-size:1.1rem;color:var(--sand-deep);font-style:italic;margin-top:4px;}
+.intro{font-size:1.08rem;line-height:1.55;text-align:center;color:var(--parchment);max-width:740px;margin:14px auto 0;}
+.divider{height:2px;width:58%;margin:14px auto 0;background:linear-gradient(90deg,transparent,var(--ocre),transparent);}
+
+.panel{background:linear-gradient(160deg,rgba(240,223,184,.07),rgba(60,41,20,.15));
+  border:1px solid rgba(181,113,43,.45);border-radius:14px;padding:20px;margin-bottom:18px;
+  box-shadow:0 10px 30px rgba(0,0,0,.45);}
+.panel h2{font-family:'Cinzel',serif;font-weight:700;color:var(--ocre);font-size:1.15rem;
+  letter-spacing:.05em;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.panel h2::before{content:"";width:7px;height:7px;background:var(--ocre);transform:rotate(45deg);}
+.lead{font-size:1.08rem;line-height:1.55;}
+
+/* Poison cards */
+.poison-card{position:relative;border-left:5px solid var(--blood-light);}
+.poison-card h2{color:var(--blood-light);}
+.poison-card h2::before{background:var(--blood-light);}
+.poison-badge{display:inline-block;font-family:'Cinzel',serif;font-weight:700;font-size:.72rem;
+  letter-spacing:.06em;text-transform:uppercase;padding:2px 10px;border-radius:6px;margin-left:8px;
+  background:rgba(196,69,58,.15);border:1px solid rgba(196,69,58,.4);color:#ffcaa0;}
+.poison-row{display:flex;gap:8px;margin-top:8px;font-size:1.02rem;line-height:1.5;}
+.poison-row .k{flex-shrink:0;width:120px;font-family:'Cinzel',serif;font-weight:700;font-size:.85rem;
+  color:var(--sand-deep);text-transform:uppercase;letter-spacing:.03em;padding-top:2px;}
+.poison-row .v{color:var(--parchment);}
+
+.note-box{display:flex;align-items:flex-start;gap:10px;margin-top:12px;padding:10px 14px;
+  border-radius:9px;font-size:.98rem;line-height:1.45;}
+.note-box svg{flex-shrink:0;width:20px;height:20px;margin-top:2px;}
+.note-warning{background:rgba(196,69,58,.12);border:1px solid rgba(196,69,58,.45);color:#ffcaa0;}
+.note-warning svg{color:var(--blood-light);}
+.note-info{background:rgba(91,155,213,.1);border:1px solid rgba(91,155,213,.35);color:#a8cce8;}
+.note-info svg{color:#7db8e8;}
+
+.steps{list-style:none;margin:10px 0;padding:0;counter-reset:step-counter;}
+.steps li{position:relative;padding:8px 0 8px 48px;font-size:1.05rem;line-height:1.5;
+  color:var(--parchment);counter-increment:step-counter;
+  border-bottom:1px solid rgba(181,113,43,.1);}
+.steps li:last-child{border-bottom:none;}
+.steps li::before{content:counter(step-counter);position:absolute;left:0;top:6px;
+  width:30px;height:30px;border-radius:50%;
+  background:linear-gradient(160deg,var(--ocre),var(--ocre-deep));
+  color:#fff5e6;font-family:'Cinzel',serif;font-weight:900;font-size:.85rem;
+  display:flex;align-items:center;justify-content:center;line-height:1;
+  box-shadow:0 2px 0 var(--rust);}
+.steps li strong{color:var(--sand-1);}
+
+footer{text-align:center;margin-top:26px;color:var(--sand-deep);font-style:italic;}
+footer .seal{color:var(--ocre);font-family:'Cinzel',serif;}
+
+@media(max-width:520px){
+  .poison-row{flex-direction:column;gap:2px;}
+  .poison-row .k{width:auto;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="back-btn"><a href="index.html">&larr; Retour au hub</a></div>
+  <header>
+    <div class="crest"><svg viewBox="0 0 100 100" fill="none">
+      <circle cx="50" cy="50" r="30" stroke="#b5712b" stroke-width="4"/>
+      <path d="M50 22 L58 44 L50 50 L42 44 Z" fill="#b5712b"/>
+      <path d="M50 78 L42 56 L50 50 L58 56 Z" fill="#b5712b"/>
+      <circle cx="50" cy="50" r="6" fill="#8a4f1a"/>
+    </svg></div>
+    <h1>Registre des Poisons</h1>
+    <div class="sub">Section M&eacute;dicale Seimei &middot; Sunagakure</div>
+    <div class="divider"></div>
+    <p class="intro">Les empoisonnements sont fr&eacute;quents sur le terrain, que ce soit par arme empoisonn&eacute;e, morsure ou ingestion. Ce registre recense les <strong>familles de poisons de base</strong> qu&rsquo;un m&eacute;decin de la Seimei doit savoir reconna&icirc;tre.</p>
+  </header>
+
+  <!-- ============================================================ -->
+  <!-- RECONNAÎTRE UN EMPOISONNEMENT -->
+  <!-- ============================================================ -->
+  <div class="panel">
+    <h2>Reconna&icirc;tre un empoisonnement</h2>
+    <p class="lead">Un empoisonnement doit &ecirc;tre suspect&eacute; face &agrave; des sympt&ocirc;mes qui apparaissent rapidement apr&egrave;s une morsure, une piq&ucirc;re, une plaie suspecte ou une ingestion&nbsp;: malaise soudain, sueurs, nervosit&eacute; anormale, sympt&ocirc;mes qui ne correspondent pas &agrave; la blessure visible.</p>
+    <div class="note-box note-info">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      <span>Le <strong>Kaiseki Ken&rsquo;shin</strong> permet de confirmer un empoisonnement et d&rsquo;en identifier la nature avant tout traitement. Ne jamais traiter &agrave; l&rsquo;aveugle.</span>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- 1. POISON PARALYSANT -->
+  <!-- ============================================================ -->
+  <div class="panel poison-card">
+    <h2>Poison paralysant <span class="poison-badge">Neurotoxique</span></h2>
+    <div class="poison-row"><span class="k">Origine</span><span class="v">Morsure, venin ou arme enduite</span></div>
+    <div class="poison-row"><span class="k">Sympt&ocirc;mes</span><span class="v">Engourdissement progressif, faiblesse musculaire, paralysie qui remonte vers le torse, difficult&eacute; &agrave; respirer dans les cas graves</span></div>
+    <div class="poison-row"><span class="k">Traitement</span><span class="v">Dokunuki no Jutsu, surveillance de la respiration, LVA si n&eacute;cessaire</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- 2. POISON HÉMOTOXIQUE -->
+  <!-- ============================================================ -->
+  <div class="panel poison-card">
+    <h2>Poison h&eacute;motoxique <span class="poison-badge">Anticoagulant</span></h2>
+    <div class="poison-row"><span class="k">Origine</span><span class="v">Morsure ou arme empoisonn&eacute;e</span></div>
+    <div class="poison-row"><span class="k">Sympt&ocirc;mes</span><span class="v">Saignements qui ne s&rsquo;arr&ecirc;tent pas, ecchymoses spontan&eacute;es, gonflement autour de la plaie</span></div>
+    <div class="poison-row"><span class="k">Traitement</span><span class="v">Dokunuki no Jutsu, compression des plaies, transfusion si l&rsquo;h&eacute;morragie est importante</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- 3. POISON CONVULSIVANT -->
+  <!-- ============================================================ -->
+  <div class="panel poison-card">
+    <h2>Poison convulsivant <span class="poison-badge">Neurotoxique</span></h2>
+    <div class="poison-row"><span class="k">Origine</span><span class="v">Morsure, piq&ucirc;re ou ingestion</span></div>
+    <div class="poison-row"><span class="k">Sympt&ocirc;mes</span><span class="v">Spasmes musculaires, convulsions, fi&egrave;vre, agitation incontr&ocirc;l&eacute;e</span></div>
+    <div class="poison-row"><span class="k">Traitement</span><span class="v">Dokunuki no Jutsu, prot&eacute;ger le patient des chocs pendant les convulsions, ne jamais forcer ses mouvements</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- 4. POISON GASTRO-INTESTINAL -->
+  <!-- ============================================================ -->
+  <div class="panel poison-card">
+    <h2>Poison gastro-intestinal <span class="poison-badge">Ingestion</span></h2>
+    <div class="poison-row"><span class="k">Origine</span><span class="v">Nourriture ou eau contamin&eacute;e</span></div>
+    <div class="poison-row"><span class="k">Sympt&ocirc;mes</span><span class="v">Vomissements, diarrh&eacute;e, douleurs abdominales, d&eacute;shydratation</span></div>
+    <div class="poison-row"><span class="k">Traitement</span><span class="v">Charbon actif si l&rsquo;ingestion date de moins de 2 heures, hydratation, surveillance</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- 5. POISON CARDIOTOXIQUE -->
+  <!-- ============================================================ -->
+  <div class="panel poison-card">
+    <h2>Poison cardiotoxique <span class="poison-badge">Cardiaque</span></h2>
+    <div class="poison-row"><span class="k">Origine</span><span class="v">Morsure ou arme empoisonn&eacute;e</span></div>
+    <div class="poison-row"><span class="k">Sympt&ocirc;mes</span><span class="v">Rythme cardiaque irr&eacute;gulier, acc&eacute;l&eacute;r&eacute; ou ralenti, douleur thoracique, malaise</span></div>
+    <div class="poison-row"><span class="k">Traitement</span><span class="v">Dokunuki no Jutsu, surveillance rapproch&eacute;e du pouls, pr&eacute;paration &agrave; une r&eacute;animation si besoin</span></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- 6. POISON DE CONTACT -->
+  <!-- ============================================================ -->
+  <div class="panel poison-card">
+    <h2>Poison de contact <span class="poison-badge">Cutan&eacute;</span></h2>
+    <div class="poison-row"><span class="k">Origine</span><span class="v">Contact direct avec la peau (plante, substance, arme enduite)</span></div>
+    <div class="poison-row"><span class="k">Sympt&ocirc;mes</span><span class="v">Br&ucirc;lure locale, rougeur, n&eacute;crose superficielle qui peut s&rsquo;&eacute;tendre lentement</span></div>
+    <div class="poison-row"><span class="k">Traitement</span><span class="v">Nettoyer imm&eacute;diatement la zone, ne jamais toucher &agrave; mains nues, Dokunuki no Jutsu si la substance a p&eacute;n&eacute;tr&eacute;</span></div>
+    <div class="note-box note-warning">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span>Toujours porter des gants avant de manipuler une plaie suspecte&nbsp;: un poison de contact peut aussi toucher le soignant.</span>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- CONDUITE À TENIR -->
+  <!-- ============================================================ -->
+  <div class="panel">
+    <h2>Conduite &agrave; tenir face &agrave; un empoisonnement</h2>
+    <ol class="steps">
+      <li><strong>S&eacute;curiser</strong> &mdash; &eacute;loigner la source du poison si elle est encore pr&eacute;sente (arme, morsure en cours)</li>
+      <li><strong>Diagnostiquer</strong> &mdash; Kaiseki Ken&rsquo;shin pour confirmer et identifier la nature du poison</li>
+      <li><strong>Stabiliser</strong> &mdash; surveiller respiration et pouls, Transfert de Chakra si le patient faiblit</li>
+      <li><strong>Traiter</strong> &mdash; Dokunuki no Jutsu (grade Adepte minimum) ou charbon actif si ingestion r&eacute;cente</li>
+      <li><strong>Transmettre</strong> &mdash; si le poison ou son évolution d&eacute;passe tes comp&eacute;tences, transmets imm&eacute;diatement &agrave; un grade sup&eacute;rieur</li>
+    </ol>
+    <div class="note-box note-warning" style="margin-top:8px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span>Ne jamais traiter un empoisonnement &agrave; l&rsquo;aveugle. Agir sans diagnostic peut aggraver l&rsquo;&eacute;tat du patient.</span>
+    </div>
+  </div>
+
+  <footer>Outil p&eacute;dagogique officiel &middot; <span class="seal">Seimei</span> &middot; Sunagakure</footer>
+</div>
+</body>
+</html>
