@@ -26,8 +26,8 @@
   <div id="intro">
     <div class="panel">
       <h2>Briefing</h2>
-      <p class="lead">Un ninja saigne abondamment de la cuisse — hémorragie artérielle. Tu dois poser un garrot au <strong>point fémoral optimal</strong> puis le serrer en tournant le levier.</p>
-      <p class="hint" style="margin-top:8px;">🎯 <strong>Phase 1</strong> : glisse le garrot 5-10 cm AU-DESSUS de la blessure (pas plus haut, pas plus bas).</p>
+      <p class="lead">Un ninja saigne abondamment de la cuisse — hémorragie artérielle. Tu dois poser un garrot <strong>à la racine du membre</strong> puis le serrer en tournant le levier.</p>
+      <p class="hint" style="margin-top:8px;">🎯 <strong>Phase 1</strong> : glisse le garrot à la racine du membre, au plus proche du tronc (jamais 5-10 cm au-dessus de la plaie — c'est incorrect).</p>
       <p class="hint" style="margin-top:6px;">🔄 <strong>Phase 2</strong> : tourne le levier (clique-glisse circulaire) jusqu'à arrêt du saignement, sans surcompresser.</p>
       <p class="hint" style="margin-top:6px;color:var(--blood-light);">⚠ Trop serré = lésions des tissus. Pas assez = saignement persistant.</p>
     </div>
@@ -56,7 +56,7 @@
       <div class="game-area" id="gameArea" style="height:380px;">
         <canvas id="cvs"></canvas>
       </div>
-      <div class="instr" id="instr">Glisse le garrot 5-10 cm au-dessus de la blessure.</div>
+      <div class="instr" id="instr">Glisse le garrot à la racine du membre, au plus proche du tronc.</div>
       <div class="feedback" id="feedback"></div>
       <div class="controls">
         <button class="btn" id="actionBtn" disabled>Valider le placement</button>
@@ -92,7 +92,7 @@ var ST={name:"",phase:1,
   animId:null};
 
 var WOUND_Y=0.55; // wound position normalised on leg
-var TARGET_MIN=WOUND_Y-0.22, TARGET_MAX=WOUND_Y-0.10; // 5-10 cm above
+var TARGET_MIN=0.06, TARGET_MAX=0.20; // à la racine du membre, au plus proche du tronc
 
 function initCanvas(){
   CVS=el('cvs'); CTX=CVS.getContext('2d');
@@ -116,7 +116,7 @@ function startGame(){
   el('pill2').className='step-pill';
   el('actionBtn').textContent='Valider le placement';
   el('actionBtn').disabled=true;
-  el('instr').textContent='Glisse le garrot 5-10 cm au-dessus de la blessure.';
+  el('instr').textContent='Glisse le garrot à la racine du membre, au plus proche du tronc.';
   el('tensionLbl').textContent='0%';
   el('bleedLbl').textContent='100%';
   el('bleedLbl').className='val bad';
@@ -305,7 +305,7 @@ el('actionBtn').addEventListener('click',function(){
     ST.placementScore=ok?1:0;
     var fb=el('feedback');
     fb.className='feedback '+(ok?'ok':'no');
-    fb.textContent=(ok?'✓ Garrot bien placé au point fémoral.':'✗ Position incorrecte. Le garrot doit être 5-10 cm AU-DESSUS de la blessure.');
+    fb.textContent=(ok?'✓ Garrot bien placé, à la racine du membre.':'✗ Position incorrecte. Le garrot doit être posé à la racine du membre, au plus proche du tronc (jamais 5-10 cm au-dessus de la plaie).');
     ST.garrotPlaced=true;
     ST.phase=2;
     el('pill1').className='step-pill done';
@@ -336,7 +336,7 @@ function finish(){
   el('verdict').textContent=g.txt;
   var box=el('reportBox'); box.innerHTML='';
   addRow(box,'Apprenti',ST.name);
-  addRow(box,'Placement',ST.placementScore?'✓ Optimal (5-10 cm au-dessus)':'✗ Incorrect');
+  addRow(box,'Placement',ST.placementScore?'✓ Optimal (racine du membre)':'✗ Incorrect');
   addRow(box,'Tension',ST.bleedingScore?'✓ Bonne (saignement contrôlé)':(ST.tension>0.95?'✗ Surcompression (lésions tissus)':'✗ Insuffisante (saignement persistant)'));
   addRow(box,'Tension finale',Math.round(ST.tension*100)+'%');
   addRow(box,'SCORE',score+' / 100');
