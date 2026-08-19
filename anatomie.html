@@ -94,9 +94,31 @@ h1{font-family:'Cinzel',serif;font-weight:900;font-size:clamp(1.5rem,4.5vw,2.3re
 
 footer{text-align:center;margin-top:26px;color:var(--sand-deep);font-style:italic;}
 footer .seal{color:var(--ocre);font-family:'Cinzel',serif;}
+
+/* Carte interactive du corps */
+.bodymap-wrap{display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start;margin-top:6px;}
+.bodymap-svg{flex:0 0 200px;margin:0 auto;}
+.hotspot{cursor:pointer;fill:rgba(181,113,43,.35);stroke:var(--ocre);stroke-width:2;
+  transition:.2s;}
+.hotspot:hover,.hotspot.active{fill:rgba(255,216,107,.5);stroke:var(--gold);}
+.hotspot-pulse{fill:none;stroke:var(--ocre);stroke-width:1.5;opacity:.6;
+  animation:hs-pulse 2.2s ease-out infinite;pointer-events:none;}
+.hotspot.active + .hotspot-pulse,.hotspot:hover + .hotspot-pulse{stroke:var(--gold);}
+@keyframes hs-pulse{
+  0%{r:9;opacity:.6;}
+  100%{r:18;opacity:0;}
+}
+.bodymap-info{flex:1 1 240px;min-width:220px;background:rgba(20,12,4,.5);
+  border:1px solid rgba(181,113,43,.35);border-radius:12px;padding:16px 18px;min-height:170px;}
+.bodymap-info .bi-title{font-family:'Cinzel',serif;font-weight:700;color:var(--gold);
+  font-size:1.05rem;letter-spacing:.03em;margin-bottom:8px;}
+.bodymap-info .bi-text{font-size:1rem;line-height:1.5;color:var(--parchment);}
+.bodymap-info .bi-danger{margin-top:8px;font-size:.92rem;color:var(--blood-light);font-style:italic;}
+.bodymap-hint{font-size:.9rem;color:var(--sand-deep);font-style:italic;margin-top:10px;text-align:center;}
 @media(max-width:520px){
   .organ-grid{grid-template-columns:1fr;}
   .zone-grid{grid-template-columns:1fr;}
+  .bodymap-wrap{flex-direction:column;align-items:center;}
 }
 </style>
 </head>
@@ -119,6 +141,46 @@ footer .seal{color:var(--ocre);font-family:'Cinzel',serif;}
   <div class="panel">
     <h2>Pourquoi conna&icirc;tre l&rsquo;anatomie ?</h2>
     <p class="lead">Un m&eacute;decin ninja qui ne conna&icirc;t pas l&rsquo;anatomie est un danger pour ses patients. Savoir <strong>o&ugrave; se trouvent les organes</strong>, <strong>quelles zones sont critiques</strong> et <strong>comment circule le chakra m&eacute;dical</strong> est indispensable avant tout geste de soin.</p>
+  </div>
+
+  <!-- CARTE INTERACTIVE -->
+  <div class="panel">
+    <h2>Carte interactive du corps</h2>
+    <p class="lead" style="margin-bottom:12px;">Clique sur un point pour r&eacute;viser l&rsquo;organe, la zone ou le point de chakra correspondant.</p>
+    <div class="bodymap-wrap">
+      <svg class="bodymap-svg" viewBox="0 0 160 340" xmlns="http://www.w3.org/2000/svg">
+        <g fill="none" stroke="rgba(240,223,184,.35)" stroke-width="2">
+          <circle cx="80" cy="30" r="22"/>
+          <line x1="80" y1="52" x2="80" y2="90"/>
+          <path d="M50 95 Q80 78 110 95 L118 190 Q80 205 42 190 Z"/>
+          <line x1="50" y1="100" x2="18" y2="175"/>
+          <line x1="110" y1="100" x2="142" y2="175"/>
+          <line x1="60" y1="205" x2="52" y2="300"/>
+          <line x1="100" y1="205" x2="108" y2="300"/>
+        </g>
+        <circle class="hotspot" data-id="cerveau" cx="80" cy="26" r="9"/>
+        <circle class="hotspot-pulse" cx="80" cy="26" r="9"/>
+        <circle class="hotspot" data-id="cou" cx="80" cy="60" r="8"/>
+        <circle class="hotspot-pulse" cx="80" cy="60" r="8"/>
+        <circle class="hotspot" data-id="coeur" cx="68" cy="118" r="9"/>
+        <circle class="hotspot-pulse" cx="68" cy="118" r="9"/>
+        <circle class="hotspot" data-id="poumons" cx="95" cy="115" r="9"/>
+        <circle class="hotspot-pulse" cx="95" cy="115" r="9"/>
+        <circle class="hotspot" data-id="foie" cx="60" cy="150" r="8"/>
+        <circle class="hotspot-pulse" cx="60" cy="150" r="8"/>
+        <circle class="hotspot" data-id="reins" cx="98" cy="160" r="8"/>
+        <circle class="hotspot-pulse" cx="98" cy="160" r="8"/>
+        <circle class="hotspot" data-id="femorale" cx="55" cy="205" r="8"/>
+        <circle class="hotspot-pulse" cx="55" cy="205" r="8"/>
+        <circle class="hotspot" data-id="paume" cx="15" cy="178" r="7"/>
+        <circle class="hotspot-pulse" cx="15" cy="178" r="7"/>
+      </svg>
+      <div class="bodymap-info" id="bodymapInfo">
+        <div class="bi-title">S&eacute;lectionne un point</div>
+        <div class="bi-text">Clique sur un des points en surbrillance pour afficher les informations m&eacute;dicales associ&eacute;es.</div>
+      </div>
+    </div>
+    <div class="bodymap-hint">361 tenketsu sont r&eacute;partis sur tout le corps &mdash; cette carte n&rsquo;en montre que les points cl&eacute;s pour un m&eacute;decin.</div>
   </div>
 
   <!-- ORGANES VITAUX -->
@@ -277,5 +339,34 @@ footer .seal{color:var(--ocre);font-family:'Cinzel',serif;}
 
   <footer>Outil p&eacute;dagogique officiel &middot; <span class="seal">Seimei</span> &middot; Sunagakure</footer>
 </div>
+
+<script>
+(function(){
+var DATA={
+  cerveau:{title:"Cerveau",text:"Centre de commande du corps et du réseau de chakra. Protégé par le crâne mais extrêmement fragile aux chocs.",danger:"Trauma crânien = coma, séquelles définitives."},
+  cou:{title:"Cou / gorge — zone interdite",text:"Concentre les artères carotides, la trachée et la moelle épinière.",danger:"Un Aspirant ne doit jamais intervenir ici sans supervision d'un Expert ou Maître."},
+  coeur:{title:"Cœur",text:"Pompe le sang dans tout le corps. Situé légèrement à gauche dans la cage thoracique, protégé par le sternum et les côtes.",danger:"Lésion = arrêt cardiaque en quelques minutes."},
+  poumons:{title:"Poumons",text:"Assurent les échanges gazeux (oxygène/CO2). Deux poumons occupent la majeure partie de la cage thoracique.",danger:"Perforation = pneumothorax, détresse respiratoire."},
+  foie:{title:"Foie",text:"Filtre le sang, neutralise les toxines, produit la bile. Situé sous les côtes à droite. Organe très vascularisé.",danger:"Rupture = hémorragie interne massive."},
+  reins:{title:"Reins",text:"Filtrent le sang et produisent l'urine. Situés dans le bas du dos, de chaque côté de la colonne vertébrale.",danger:"Lésion = insuffisance rénale, empoisonnement progressif."},
+  femorale:{title:"Artère fémorale",text:"Irrigue la jambe entière. Point de compression de référence pour un garrot posé à l'aine ou à la racine de la cuisse.",danger:"Hémorragie = choc en 2-3 minutes."},
+  paume:{title:"Paume des mains",text:"Point d'émission principal du chakra médical. C'est par là que passent la Paume Spirituelle, la Paume Mystique et le Kaiseki Kenshin.",danger:""}
+};
+var svg=document.querySelector('.bodymap-svg');
+var info=document.getElementById('bodymapInfo');
+if(svg){
+  svg.querySelectorAll('.hotspot').forEach(function(hs){
+    hs.addEventListener('click',function(){
+      svg.querySelectorAll('.hotspot').forEach(function(h){h.classList.remove('active');});
+      hs.classList.add('active');
+      var d=DATA[hs.getAttribute('data-id')];
+      if(!d)return;
+      info.innerHTML='<div class="bi-title">'+d.title+'</div><div class="bi-text">'+d.text+'</div>'
+        +(d.danger?'<div class="bi-danger">'+d.danger+'</div>':'');
+    });
+  });
+}
+})();
+</script>
 </body>
 </html>
