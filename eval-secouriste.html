@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seimei &mdash; &Eacute;valuation Secouriste de Terrain | Sunagakure</title>
+<script src="vendor/supabase.js"></script>
+<script src="config.js"></script>
+<style>
+@import url('vendor/fonts.css');
+:root{
+  --sand-1:#f4e4c1;--sand-deep:#c89b5e;--ocre:#b5712b;--ocre-deep:#8a4f1a;
+  --rust:#7a3b15;--parchment:#f0dfb8;--chakra:#6fcf97;--chakra-glow:#3ddc84;
+  --blood-light:#c4453a;--gold:#ffd86b;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Cormorant Garamond',serif;color:var(--parchment);min-height:100vh;overflow-x:hidden;
+  background:radial-gradient(ellipse at 50% -10%,#5a3d1e 0%,transparent 55%),
+    linear-gradient(160deg,#2e1d0c 0%,#1c1106 60%,#140c04 100%);}
+body::before{content:"";position:fixed;inset:0;opacity:.06;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  z-index:1;}
+.smoke{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;transition:opacity 1.2s;
+  background:radial-gradient(ellipse at 20% 30%,rgba(120,110,100,.35),transparent 60%),
+    radial-gradient(ellipse at 80% 70%,rgba(120,110,100,.3),transparent 55%);}
+.smoke.on{opacity:1;}
+.wrap{position:relative;z-index:2;max-width:800px;margin:0 auto;padding:28px 16px 80px;}
+.back-btn{text-align:right;margin-bottom:8px;}
+.back-btn a{font-family:'Cinzel',serif;font-weight:700;font-size:.82rem;letter-spacing:.05em;
+  padding:8px 16px;border:1px solid var(--ocre);border-radius:9px;color:var(--sand-1);
+  text-decoration:none;text-transform:uppercase;transition:.2s;}
+.back-btn a:hover{background:rgba(181,113,43,.2);}
+header{text-align:center;margin-bottom:24px;}
+.crest{width:64px;height:64px;margin:0 auto 10px;border:3px solid var(--blood-light);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle,rgba(196,69,58,.22),transparent 70%);
+  box-shadow:0 0 24px rgba(196,69,58,.3);}
+.crest svg{width:36px;height:36px;}
+h1{font-family:'Cinzel',serif;font-weight:900;font-size:clamp(1.35rem,4.5vw,2.2rem);
+  letter-spacing:.06em;color:var(--sand-1);text-shadow:0 2px 0 var(--rust),0 0 28px rgba(181,113,43,.5);}
+.sub{font-size:1.1rem;color:var(--sand-deep);font-style:italic;margin-top:4px;}
+.eval-badge{display:inline-block;margin-top:10px;font-family:'Cinzel',serif;font-weight:700;
+  font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;padding:4px 14px;border-radius:7px;
+  background:rgba(196,69,58,.15);border:1px solid rgba(196,69,58,.5);color:#ffcaa0;}
+.divider{height:2px;width:58%;margin:14px auto 0;background:linear-gradient(90deg,transparent,var(--blood-light),transparent);}
+
+/* Phase indicator */
+.phase-track{display:flex;justify-content:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+.phase-pill{font-family:'Cinzel',serif;font-weight:700;font-size:.78rem;letter-spacing:.05em;
+  text-transform:uppercase;padding:6px 14px;border-radius:20px;
+  border:1px solid rgba(181,113,43,.4);color:var(--sand-deep);background:rgba(20,12,4,.4);transition:.2s;}
+.phase-pill.active{border-color:var(--gold);color:var(--gold);background:rgba(255,216,107,.1);}
+.phase-pill.done{border-color:var(--chakra);color:var(--chakra-glow);background:rgba(61,220,132,.08);}
+
+.panel{background:linear-gradient(160deg,rgba(240,223,184,.07),rgba(60,41,20,.15));
+  border:1px solid rgba(181,113,43,.45);border-radius:14px;padding:22px;margin-bottom:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,.45);}
+.panel h2{font-family:'Cinzel',serif;font-weight:700;color:var(--ocre);font-size:1.18rem;
+  letter-spacing:.05em;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.panel h2::before{content:"";width:7px;height:7px;background:var(--ocre);transform:rotate(45deg);}
+.rules-list{list-style:none;margin:10px 0 0;padding:0;}
+.rules-list li{position:relative;padding:6px 0 6px 22px;font-size:1.02rem;line-height:1.5;color:var(--parchment);}
+.rules-list li::before{content:"\2713";position:absolute;left:0;top:6px;color:var(--chakra-glow);font-size:.85rem;}
+.btn{font-family:'Cinzel',serif;font-weight:700;letter-spacing:.05em;cursor:pointer;border:none;
+  border-radius:9px;padding:12px 22px;font-size:.92rem;text-transform:uppercase;
+  background:linear-gradient(160deg,var(--blood-light),#8b2a22);color:#fff5e6;
+  box-shadow:0 5px 0 #5a1a14;transition:transform .12s;}
+.btn:hover{transform:translateY(-2px);}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #5a1a14;}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important;}
+.btn.ghost{background:transparent;border:1px solid var(--ocre);box-shadow:none;color:var(--sand-1);font-size:.82rem;padding:7px 14px;}
+.controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:16px;}
+
+.progress-bar{display:flex;gap:6px;justify-content:center;margin-bottom:18px;flex-wrap:wrap;}
+.pdot{width:18px;height:6px;border-radius:3px;background:rgba(181,113,43,.25);border:1px solid rgba(181,113,43,.35);transition:.3s;}
+.pdot.ok{background:var(--chakra);border-color:var(--chakra);}
+.pdot.bad{background:var(--blood-light);border-color:var(--blood-light);}
+.pdot.cur{background:var(--gold);border-color:var(--gold);box-shadow:0 0 8px rgba(255,216,107,.5);}
+.score-bar{font-family:'Cinzel',serif;font-weight:700;font-size:1rem;color:var(--sand-deep);
+  text-align:center;margin-bottom:10px;letter-spacing:.04em;}
+.score-bar .val{color:var(--sand-1);}
+
+.case-box{background:rgba(20,12,4,.55);border:1px solid rgba(181,113,43,.35);border-radius:12px;
+  padding:18px 20px;margin-bottom:18px;}
+.case-label{font-family:'Cinzel',serif;font-weight:700;font-size:.78rem;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--blood-light);margin-bottom:6px;}
+.case-text{font-size:1.1rem;line-height:1.55;color:var(--parchment);}
+
+.choice{display:block;width:100%;text-align:left;padding:13px 18px;margin-bottom:9px;
+  font-family:inherit;font-size:1.05rem;color:var(--parchment);cursor:pointer;
+  background:rgba(20,12,4,.45);border:1.5px solid rgba(181,113,43,.35);
+  border-radius:10px;transition:.18s;line-height:1.4;}
+.choice:hover{background:rgba(181,113,43,.12);border-color:var(--ocre);}
+.choice.sel{background:rgba(255,216,107,.12);border-color:var(--gold);color:var(--gold);}
+.choice.correct{background:rgba(61,220,132,.12);border-color:var(--chakra);color:var(--chakra-glow);}
+.choice.wrong{background:rgba(196,69,58,.12);border-color:var(--blood-light);color:#ffcaa0;}
+.choice.dis{cursor:default;opacity:.55;}
+.choice.dis.correct,.choice.dis.wrong{opacity:1;}
+.explain{background:rgba(20,12,4,.5);border:1px dashed var(--ocre);border-radius:10px;
+  padding:14px 16px;margin-top:14px;display:none;line-height:1.5;font-size:.98rem;}
+.explain.vis{display:block;}
+.explain strong{color:var(--sand-1);}
+
+/* timer (partie pratique) */
+.timer-wrap{margin-bottom:16px;}
+.timer-label{display:flex;justify-content:space-between;font-family:'Cinzel',serif;font-size:.8rem;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--sand-deep);margin-bottom:5px;}
+.timer-label .t-alert{color:var(--blood-light);}
+.timer-track{height:10px;border-radius:6px;background:rgba(20,12,4,.6);border:1px solid rgba(181,113,43,.35);overflow:hidden;}
+.timer-fill{height:100%;background:linear-gradient(90deg,var(--chakra),var(--gold));width:100%;transition:width linear;}
+.timer-fill.danger{background:linear-gradient(90deg,var(--gold),var(--blood-light));}
+
+.patients-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:6px;}
+.patient-card{background:rgba(20,12,4,.5);border:2px solid rgba(181,113,43,.4);border-radius:12px;
+  padding:16px;cursor:pointer;transition:.18s;text-align:left;color:inherit;}
+.patient-card:hover{border-color:var(--gold);transform:translateY(-3px);box-shadow:0 10px 26px rgba(255,216,107,.15);}
+.patient-card .p-name{font-family:'Cinzel',serif;font-weight:700;color:var(--sand-1);font-size:1.05rem;margin-bottom:6px;}
+.patient-card .p-desc{font-size:.98rem;line-height:1.45;color:var(--parchment);}
+.feedback{border-radius:10px;padding:14px 16px;margin-top:6px;line-height:1.5;font-size:1rem;
+  background:rgba(61,220,132,.1);border:1px solid rgba(61,220,132,.4);color:#c8f0d4;}
+
+#endScreen{display:none;}
+.verdict-badge{font-family:'Cinzel',serif;font-weight:900;font-size:1.3rem;text-align:center;
+  padding:10px 18px;border-radius:10px;margin:10px auto 14px;display:table;letter-spacing:.03em;}
+.verdict-badge.pass{background:rgba(61,220,132,.15);border:2px solid var(--chakra);color:var(--chakra-glow);}
+.verdict-badge.fail{background:rgba(196,69,58,.15);border:2px solid var(--blood-light);color:#ffcaa0;}
+.final-verdict{text-align:center;font-size:1.08rem;margin-bottom:6px;line-height:1.5;color:var(--sand-deep);}
+.subresult-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px;}
+.subresult{background:rgba(20,12,4,.5);border:1px solid rgba(181,113,43,.35);border-radius:10px;padding:14px;text-align:center;}
+.subresult .sr-label{font-family:'Cinzel',serif;font-weight:700;font-size:.78rem;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--sand-deep);margin-bottom:6px;}
+.subresult .sr-value{font-family:'Cinzel',serif;font-weight:900;font-size:1.5rem;}
+.subresult .sr-value.pass{color:var(--chakra-glow);}
+.subresult .sr-value.fail{color:var(--blood-light);}
+@media(max-width:520px){.subresult-grid{grid-template-columns:1fr;}}
+
+.recap-item{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;
+  border-bottom:1px solid rgba(181,113,43,.2);font-size:1rem;}
+.recap-item:last-child{border:none;}
+.recap-item .rname{color:var(--sand-deep);flex:1;}
+.recap-item .rtag{font-family:'Cinzel',serif;font-weight:700;font-size:.85rem;padding:3px 10px;border-radius:5px;}
+.rok{background:rgba(61,220,132,.15);color:var(--chakra-glow);}
+.rfail{background:rgba(196,69,58,.15);color:#ffcaa0;}
+
+.step-recap{list-style:none;margin:10px 0 0;padding:0;}
+.step-recap li{position:relative;padding:7px 0 7px 22px;font-size:.98rem;line-height:1.45;}
+.step-recap li::before{content:"\2713";position:absolute;left:0;top:7px;color:var(--chakra-glow);}
+.step-recap li.bad::before{content:"\2716";color:var(--blood-light);}
+
+.fiche{background:rgba(20,12,4,.5);border:1px dashed var(--gold);border-radius:10px;padding:16px 18px;margin-top:10px;}
+.fiche h3{font-family:'Cinzel',serif;font-weight:700;color:var(--gold);font-size:.95rem;letter-spacing:.05em;margin-bottom:10px;text-transform:uppercase;}
+.fiche-row{display:flex;justify-content:space-between;padding:4px 0;font-size:.98rem;border-bottom:1px dotted rgba(181,113,43,.25);}
+.fiche-row:last-child{border-bottom:none;}
+.fiche-row .fk{color:var(--sand-deep);}
+.fiche-row .fv{color:var(--sand-1);font-weight:600;}
+
+footer{text-align:center;margin-top:30px;color:var(--sand-deep);font-style:italic;}
+footer .seal{color:var(--ocre);font-family:'Cinzel',serif;}
+@media(max-width:480px){.panel{padding:16px 14px;}.case-text{font-size:1rem;}.patients-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="smoke" id="smoke"></div>
+<div class="wrap">
+  <div class="back-btn"><a href="index.html">&larr; Retour au hub</a></div>
+  <header>
+    <div class="crest"><svg viewBox="0 0 24 24" fill="none" stroke="#c4453a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-4Z"/><path d="M9 12l2 2 4-4"/>
+    </svg></div>
+    <h1>&Eacute;valuation Secouriste de Terrain</h1>
+    <div class="sub">Section M&eacute;dicale Seimei &middot; Sunagakure</div>
+    <div class="eval-badge">Gestes de premiers secours &mdash; sans ninjutsu m&eacute;dical</div>
+    <div class="divider"></div>
+  </header>
+
+  <div class="phase-track" id="phaseTrack">
+    <div class="phase-pill active" id="ph1">1 &middot; Th&eacute;orie</div>
+    <div class="phase-pill" id="ph2">2 &middot; Terrain</div>
+    <div class="phase-pill" id="ph3">3 &middot; Bilan</div>
+  </div>
+
+  <!-- INTRO -->
+  <div id="introScreen">
+    <div class="panel">
+      <h2>Contexte</h2>
+      <p style="font-size:1.08rem;line-height:1.55;">Tu es apprenti secouriste sur le terrain, en pleine zone de guerre. Pas de chakra m&eacute;dical, pas de technique de ninjutsu &mdash; seulement tes mains, ton mat&eacute;riel de base et les bons r&eacute;flexes. Cette &eacute;valuation se d&eacute;roule en deux temps.</p>
+    </div>
+    <div class="panel">
+      <h2>D&eacute;roul&eacute; de l&rsquo;&eacute;valuation</h2>
+      <ul class="rules-list">
+        <li><strong>Partie 1 &mdash; Th&eacute;orie</strong> : 15 questions sur les gestes de base (h&eacute;morragie, fractures, br&ucirc;lures, RCR, protocoles). Score minimum de <strong>80&nbsp;%</strong> requis.</li>
+        <li><strong>Partie 2 &mdash; Terrain</strong> : mise en situation chronom&eacute;tr&eacute;e sous pression, avec plusieurs bless&eacute;s &agrave; trier et traiter dans le bon ordre. Une erreur de priorit&eacute; ou un geste interdit termine l&rsquo;&eacute;preuve.</li>
+        <li><strong>Partie 3 &mdash; Bilan</strong> : certification finale &laquo;&nbsp;Apte au terrain&nbsp;&raquo; ou &laquo;&nbsp;Formation compl&eacute;mentaire requise&nbsp;&raquo;, avec fiche de triage r&eacute;capitulative.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h2>Identification</h2>
+      <div style="margin:10px 0;">
+        <label style="display:block;font-size:1.05rem;color:var(--sand-deep);margin-bottom:6px;">Nom de shinobi</label>
+        <input type="text" id="nameInput" placeholder="Ex : Artel Ga&iuml;a" maxlength="28" autocomplete="off"
+          style="width:100%;padding:13px 16px;font-family:inherit;font-size:1.15rem;background:rgba(20,12,4,.6);color:var(--sand-1);border:1px solid var(--ocre);border-radius:8px;outline:none;">
+      </div>
+      <div class="controls"><button class="btn" id="startBtn">D&eacute;marrer l&rsquo;&eacute;valuation</button></div>
+    </div>
+  </div>
+
+  <!-- PARTIE 1 : QCM -->
+  <div id="qcmScreen" style="display:none;">
+    <div class="progress-bar" id="pbar"></div>
+    <div class="score-bar">Score : <span class="val" id="scoreLbl">0 / 0</span></div>
+    <div class="panel">
+      <h2 id="caseTitle">Question 1 / 15</h2>
+      <div class="case-box">
+        <div class="case-label">Situation</div>
+        <div class="case-text" id="caseText"></div>
+      </div>
+      <div id="choicesBox"></div>
+      <div class="controls" id="valCtrl"><button class="btn" id="valBtn" disabled>Valider</button></div>
+      <div class="explain" id="explBox"></div>
+      <div class="controls" id="nextCtrl" style="display:none;"><button class="btn" id="nextBtn">Question suivante</button></div>
+    </div>
+  </div>
+
+  <!-- TRANSITION -->
+  <div id="transitionScreen" style="display:none;">
+    <div class="panel" style="text-align:center;">
+      <h2 style="justify-content:center;">Partie 1 termin&eacute;e</h2>
+      <p style="font-size:1.3rem;font-family:'Cinzel',serif;font-weight:900;color:var(--sand-1);margin:8px 0;" id="qcmResultLbl"></p>
+      <p style="font-size:1.05rem;line-height:1.55;color:var(--parchment);">Pr&eacute;pare-toi &mdash; la partie th&eacute;orique est termin&eacute;e. Place maintenant &agrave; la mise en situation sur le terrain. Fumig&egrave;nes au sol, tirs simul&eacute;s au loin : trois bless&eacute;s t&rsquo;attendent.</p>
+      <div class="controls"><button class="btn" id="toFieldBtn">Entrer sur le terrain</button></div>
+    </div>
+  </div>
+
+  <!-- PARTIE 2 : TERRAIN -->
+  <div id="fieldScreen" style="display:none;">
+    <div class="timer-wrap">
+      <div class="timer-label"><span id="timerStageLbl">Étape</span><span id="timerCount" class="t-alert">--</span></div>
+      <div class="timer-track"><div class="timer-fill" id="timerFill"></div></div>
+    </div>
+    <div class="panel">
+      <h2 id="stageTitle">Situation</h2>
+      <div class="case-box">
+        <div class="case-label" id="scenarioLabel">Terrain</div>
+        <div class="case-text" id="scenarioText"></div>
+      </div>
+      <div id="stageContent"></div>
+      <div class="feedback" id="stepFeedback" style="display:none;"></div>
+    </div>
+  </div>
+
+  <!-- BILAN FINAL -->
+  <div id="endScreen">
+    <div class="panel" style="text-align:center;">
+      <h2 style="justify-content:center;">Bilan de l&rsquo;&eacute;valuation</h2>
+      <div id="verdictBadge"></div>
+      <div class="final-verdict" id="finalVerdict"></div>
+      <div class="subresult-grid">
+        <div class="subresult">
+          <div class="sr-label">Partie 1 &middot; Théorie</div>
+          <div class="sr-value" id="srTheorie"></div>
+        </div>
+        <div class="subresult">
+          <div class="sr-label">Partie 2 &middot; Terrain</div>
+          <div class="sr-value" id="srTerrain"></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>R&eacute;capitulatif &mdash; Th&eacute;orie</h2>
+      <div id="recapList"></div>
+    </div>
+    <div class="panel" id="terrainRecapPanel" style="display:none;">
+      <h2>R&eacute;capitulatif &mdash; Terrain</h2>
+      <ul class="step-recap" id="stepRecapList"></ul>
+    </div>
+    <div class="panel" id="fichePanel" style="display:none;">
+      <div class="fiche">
+        <h3>Fiche de Triage M&eacute;dical de Combat</h3>
+        <div class="fiche-row"><span class="fk">Secouriste</span><span class="fv" id="ficheName"></span></div>
+        <div class="fiche-row"><span class="fk">Heure de pose du garrot</span><span class="fv" id="ficheHeure"></span></div>
+        <div class="fiche-row"><span class="fk">Membre touché</span><span class="fv">Mollet gauche (hémorragie en jet)</span></div>
+        <div class="fiche-row"><span class="fk">Statut du flux de chakra</span><span class="fv">Stable</span></div>
+        <div class="fiche-row"><span class="fk">Temps total sur le terrain</span><span class="fv" id="ficheTemps"></span></div>
+      </div>
+    </div>
+    <div class="controls" style="margin-top:6px;"><button class="btn ghost" id="retryBtn">Repasser l&rsquo;&eacute;valuation</button></div>
+  </div>
+
+  <footer>Outil p&eacute;dagogique officiel &middot; <span class="seal">Seimei</span> &middot; Sunagakure</footer>
+</div>
+
+<script>
+(function(){
+var el=function(id){return document.getElementById(id);};
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+
+var PASS_PCT=80;
+var playerName='';
+var fieldStartTime=0;
+var terrainRecap=[];
+var terrainPassed=null;
+var timerHandle=null,timerInterval=null;
+
+/* ═══════════════════ PARTIE 1 : QCM ═══════════════════ */
+var POOL=[
+  {situation:"Tu arrives sur un blessé au milieu d'échanges de tirs actifs. Quel est ton tout premier réflexe, avant même de le toucher ?",
+   answer:"Vérifier que la zone est sûre, sécuriser ou évacuer si besoin",
+   opts:["Vérifier que la zone est sûre, sécuriser ou évacuer si besoin","Commencer immédiatement les compressions thoraciques","Poser un garrot par précaution","Crier pour appeler de l'aide"],
+   explain:"Un secouriste blessé à son tour ne peut plus aider personne. La sécurité de la zone passe toujours avant le premier geste de soin."},
+
+  {situation:"Comment vérifies-tu si une victime inconsciente respire encore ?",
+   answer:"Bascule la tête, puis écoute/sens/regarde pendant 10 secondes",
+   opts:["Bascule la tête, puis écoute/sens/regarde pendant 10 secondes","Tu secoues la victime jusqu'à ce qu'elle réagisse","Tu poses ta main sur son front une seconde","Tu vérifies uniquement le pouls au poignet"],
+   explain:"Basculer la tête dégage les voies aériennes ; 10 secondes suffisent pour confirmer une respiration présente ou absente."},
+
+  {situation:"La victime est inconsciente mais respire normalement. Quel geste appliques-tu ?",
+   answer:"La Position Latérale de Sécurité (PLS)",
+   opts:["La Position Latérale de Sécurité (PLS)","La réanimation cardio-respiratoire","Un garrot préventif","Tu la laisses allongée sur le dos sans bouger"],
+   explain:"La PLS protège les voies respiratoires d'une victime inconsciente qui respire encore, en évitant l'étouffement par la langue ou des vomissements."},
+
+  {situation:"La victime ne respire pas du tout. Que fais-tu immédiatement ?",
+   answer:"Réanimation : 30 compressions puis 2 insufflations, en boucle",
+   opts:["Réanimation : 30 compressions puis 2 insufflations, en boucle","Tu attends 2 minutes pour voir si elle reprend seule","Position Latérale de Sécurité","Tu cherches d'abord une hémorragie"],
+   explain:"L'absence de respiration signale un arrêt cardiaque : le cycle de réanimation 30:2 doit démarrer sans délai."},
+
+  {situation:"À quel rythme dois-tu effectuer les compressions thoraciques ?",
+   answer:"Entre 100 et 120 par minute",
+   opts:["Entre 100 et 120 par minute","Entre 40 et 60 par minute","Entre 150 et 180 par minute","Peu importe, tant que c'est régulier"],
+   explain:"100 à 120 compressions par minute est le rythme reconnu pour une réanimation efficace."},
+
+  {situation:"À quelle profondeur doivent s'enfoncer les compressions thoraciques chez un adulte ?",
+   answer:"5 à 6 cm",
+   opts:["5 à 6 cm","1 à 2 cm","10 à 12 cm","Aussi profond que possible"],
+   explain:"Une compression trop superficielle est inefficace ; 5-6 cm est la profondeur recommandée pour un adulte."},
+
+  {situation:"Une hémorragie de membre ne s'arrête pas malgré une compression directe forte. Que fais-tu ?",
+   answer:"Tu poses un garrot à la racine du membre, au plus près du tronc",
+   opts:["Tu poses un garrot à la racine du membre, au plus près du tronc","Tu poses le garrot 5 à 10 cm au-dessus de la plaie","Tu poses le garrot directement sur la plaie","Tu retires le pansement pour regarder la plaie"],
+   explain:"Le garrot doit comprimer les gros vaisseaux à la racine du membre — le poser trop près de la plaie est inefficace et retarde l'arrêt du saignement."},
+
+  {situation:"Une fois un garrot posé, quelle information dois-tu impérativement noter ?",
+   answer:"L'heure exacte de pose",
+   opts:["L'heure exacte de pose","Le nom de la victime uniquement","Rien, ce n'est pas nécessaire","La météo du moment"],
+   explain:"L'heure de pose est essentielle pour l'équipe médicale qui prendra le relais — un garrot ne doit jamais rester en place indéfiniment sans suivi."},
+
+  {situation:"Le pansement compressif que tu as posé est traversé par le sang. Que fais-tu ?",
+   answer:"Tu ajoutes un second pansement par-dessus, sans retirer le premier",
+   opts:["Tu ajoutes un second pansement par-dessus, sans retirer le premier","Tu retires le premier pansement et le remplaces","Tu poses immédiatement un garrot","Tu ne fais rien de plus"],
+   explain:"Retirer le premier pansement romprait la coagulation déjà amorcée — on empile toujours un nouveau pansement par-dessus."},
+
+  {situation:"Tu es face à une fracture ouverte, os visible. Quel geste est strictement interdit ?",
+   answer:"Remettre l'os en place",
+   opts:["Remettre l'os en place","Couvrir la plaie avec un linge propre","Limiter les mouvements du membre","Comprimer autour de la plaie, pas dessus"],
+   explain:"On ne remet jamais un os exposé en place sur le terrain : cela aggrave la blessure et le risque d'infection. Il faut couvrir, immobiliser et transmettre en urgence."},
+
+  {situation:"Une brûlure du 2e degré présente des cloques. Quel geste est interdit ?",
+   answer:"Percer les cloques",
+   opts:["Percer les cloques","Refroidir à l'eau fraîche 20 minutes","Poser un pansement non serré","Surveiller l'évolution de la brûlure"],
+   explain:"Percer une cloque ouvre une porte d'entrée aux infections. On la laisse intacte et on protège avec un pansement non serré."},
+
+  {situation:"Face à une brûlure du 3e degré (peau blanche, noire ou cartonnée), quelle est la bonne conduite ?",
+   answer:"Ne rien appliquer sur la zone, secours immédiats",
+   opts:["Ne rien appliquer sur la zone, secours immédiats","Appliquer un cataplasme d'herbes","Percer et nettoyer la zone","Appliquer de la graisse ou de l'huile"],
+   explain:"Au 3e degré, aucune substance ne doit être appliquée directement — c'est une urgence absolue nécessitant une évacuation immédiate."},
+
+  {situation:"Dans l'arbre décisionnel d'urgence, quelle est la toute dernière étape, une fois la victime stabilisée ?",
+   answer:"Le bilan secondaire (rechercher fractures, brûlures, plaies et prendre les constantes)",
+   opts:["Le bilan secondaire (rechercher fractures, brûlures, plaies et prendre les constantes)","Le transport immédiat sans vérification","La pose systématique d'un garrot","L'annonce du diagnostic à la victime"],
+   explain:"Le bilan secondaire vient après la sécurisation des fonctions vitales — il complète l'évaluation avant la prise en charge finale."},
+
+  {situation:"Une victime inconsciente qui respire encore ne doit jamais être...",
+   answer:"laissée seule, sans surveillance",
+   opts:["laissée seule, sans surveillance","mise en Position Latérale de Sécurité","couverte pour limiter l'hypothermie","surveillée en continu"],
+   explain:"Une victime inconsciente peut se dégrader à tout moment (vomissement, arrêt respiratoire) — elle doit toujours rester sous surveillance."},
+
+  {situation:"Sur le champ de bataille, plusieurs blessés sont à traiter en même temps avec des moyens limités. Qui prends-tu en charge en priorité ?",
+   answer:"Celui qui ne respire pas ou fait une hémorragie massive non contrôlée",
+   opts:["Celui qui ne respire pas ou fait une hémorragie massive non contrôlée","Celui qui crie le plus fort","Le gradé le plus élevé, par principe","Celui qui est arrivé en premier sur zone"],
+   explain:"Le triage se fait selon l'urgence vitale immédiate — détresse respiratoire ou hémorragie massive priment sur tout le reste, y compris le grade ou l'ordre d'arrivée."}
+];
+
+var NB=15,cases=[],ci=0,score=0,results=[],selected=null,validated=false;
+
+el('startBtn').addEventListener('click',startQcm);
+el('valBtn').addEventListener('click',validate);
+el('nextBtn').addEventListener('click',next);
+el('toFieldBtn').addEventListener('click',startField);
+el('retryBtn').addEventListener('click',function(){location.reload();});
+
+function startQcm(){
+  var nm=el('nameInput').value.trim();
+  if(!nm){el('nameInput').style.borderColor='var(--blood-light)';setTimeout(function(){el('nameInput').style.borderColor='';},900);return;}
+  playerName=nm;
+  cases=shuffle(POOL).slice(0,NB);
+  ci=0;score=0;results=[];
+  el('introScreen').style.display='none';el('qcmScreen').style.display='';
+  buildBar();loadCase();
+}
+
+function buildBar(){var b=el('pbar');b.innerHTML='';for(var i=0;i<NB;i++){var d=document.createElement('div');d.className='pdot'+(i===0?' cur':'');d.id='pd'+i;b.appendChild(d);}}
+function updateBar(){for(var i=0;i<NB;i++){var d=el('pd'+i);d.className='pdot';if(i<results.length)d.className+=(results[i]?' ok':' bad');else if(i===ci)d.className+=' cur';}}
+
+function loadCase(){
+  var c=cases[ci];validated=false;selected=null;
+  el('caseTitle').textContent='Question '+(ci+1)+' / '+NB;
+  el('caseText').textContent=c.situation;
+  var box=el('choicesBox');box.innerHTML='';
+  var opts=shuffle(c.opts);
+  opts.forEach(function(o){
+    var btn=document.createElement('button');btn.className='choice';btn.textContent=o;
+    btn.setAttribute('data-val',o);
+    btn.addEventListener('click',function(){if(validated)return;selectChoice(o);});
+    box.appendChild(btn);
+  });
+  el('valBtn').disabled=true;
+  el('valCtrl').style.display='';el('nextCtrl').style.display='none';
+  el('explBox').className='explain';el('explBox').innerHTML='';
+  el('scoreLbl').textContent=score+' / '+ci;
+  updateBar();
+}
+
+function selectChoice(v){
+  selected=v;
+  var btns=el('choicesBox').children;
+  for(var i=0;i<btns.length;i++)btns[i].className='choice'+(btns[i].getAttribute('data-val')===v?' sel':'');
+  el('valBtn').disabled=false;
+}
+
+function validate(){
+  if(validated)return;validated=true;
+  var c=cases[ci];
+  var ok=(selected===c.answer);
+  if(ok)score++;
+  results.push(ok);
+  var btns=el('choicesBox').children;
+  for(var i=0;i<btns.length;i++){
+    var b=btns[i],v=b.getAttribute('data-val');
+    b.className='choice dis';
+    if(v===c.answer)b.className+=' correct';
+    else if(v===selected&&!ok)b.className+=' wrong';
+  }
+  var ex=el('explBox');
+  ex.innerHTML=(ok?'<p style="color:var(--chakra-glow);font-weight:600;margin-bottom:8px;">✔ Correct !</p>':'<p style="color:#ffcaa0;font-weight:600;margin-bottom:8px;">✘ Réponse incorrecte.</p>')
+    +'<p><strong>Bonne réponse :</strong> '+c.answer+'</p><p style="margin-top:6px;">'+c.explain+'</p>';
+  ex.className='explain vis';
+  el('valCtrl').style.display='none';
+  el('nextBtn').textContent=(ci===NB-1)?'Voir le résultat de la partie 1':'Question suivante';
+  el('nextCtrl').style.display='';
+  el('scoreLbl').textContent=score+' / '+(ci+1);
+  updateBar();
+}
+
+function next(){
+  ci++;
+  if(ci>=NB){endQcm();return;}
+  loadCase();
+}
+
+var qcmPct=0;
+function endQcm(){
+  qcmPct=Math.round((score/NB)*100);
+  el('ph1').classList.remove('active');el('ph1').classList.add('done');
+  el('ph2').classList.add('active');
+  el('qcmScreen').style.display='none';
+  el('transitionScreen').style.display='';
+  el('qcmResultLbl').textContent=score+' / '+NB+' ('+qcmPct+' %)';
+}
+
+/* ═══════════════════ PARTIE 2 : TERRAIN ═══════════════════ */
+function startField(){
+  el('transitionScreen').style.display='none';
+  el('fieldScreen').style.display='';
+  el('smoke').classList.add('on');
+  fieldStartTime=Date.now();
+  terrainRecap=[];
+  stageTriage();
+}
+
+function clearTimer(){if(timerHandle)clearTimeout(timerHandle);if(timerInterval)clearInterval(timerInterval);}
+
+function runTimer(seconds,onExpire){
+  clearTimer();
+  var fill=el('timerFill');var countLbl=el('timerCount');
+  fill.style.transition='none';fill.style.width='100%';fill.className='timer-fill';
+  void fill.offsetWidth;
+  fill.style.transition='width '+seconds+'s linear';
+  fill.style.width='0%';
+  var remaining=seconds;countLbl.textContent=remaining+'s';
+  timerInterval=setInterval(function(){
+    remaining--;
+    if(remaining<=3)fill.className='timer-fill danger';
+    countLbl.textContent=Math.max(remaining,0)+'s';
+    if(remaining<=0)clearInterval(timerInterval);
+  },1000);
+  timerHandle=setTimeout(function(){clearTimer();onExpire();},seconds*1000);
+}
+
+function terrainFail(reason){
+  clearTimer();
+  terrainPassed=false;
+  el('stepFeedback').style.display='none';
+  finishAll(reason);
+}
+
+function feedbackThenNext(msg,nextFn,delay){
+  var fb=el('stepFeedback');
+  fb.style.display='block';fb.textContent=msg;
+  setTimeout(function(){fb.style.display='none';nextFn();},delay||1500);
+}
+
+function stageTriage(){
+  el('timerStageLbl').textContent='Choix du premier patient à traiter';
+  el('scenarioLabel').textContent='Zone d\'intervention';
+  el('scenarioText').textContent='Trois blessés au sol. Fumée épaisse, visibilité réduite. Tu dois choisir qui traiter en premier, maintenant.';
+  el('stageTitle').textContent='Triage — qui traites-tu en premier ?';
+  var box=el('stageContent');box.innerHTML='';
+  var grid=document.createElement('div');grid.className='patients-grid';
+  var patients=[
+    {id:'A',name:'Cas A — Brûlure au bras',desc:'2e degré, cloques visibles sur l\'avant-bras. Douleur vive mais patient conscient et stable.'},
+    {id:'B',name:'Cas B — Hémorragie à la jambe',desc:'Plaie au mollet, le sang gicle par jets réguliers. Le patient pâlit à vue d\'œil.'},
+    {id:'C',name:'Cas C — Épaule déboîtée',desc:'Luxation visible, le bras pend anormalement. Le patient hurle de douleur mais respire normalement.'}
+  ];
+  patients.sort(function(){return Math.random()-0.5;});
+  patients.forEach(function(p){
+    var card=document.createElement('button');card.className='patient-card';
+    card.innerHTML='<div class="p-name">'+p.name+'</div><div class="p-desc">'+p.desc+'</div>';
+    card.addEventListener('click',function(){
+      clearTimer();
+      if(p.id!=='B'){
+        terrainRecap.push({ok:false,text:'Premier soin porté au mauvais patient ('+p.name+')'});
+        terrainFail('Pendant que tu t\'occupais du '+p.name+', le Cas B s\'est vidé de son sang. L\'hémorragie non traitée est fatale en 2 à 3 minutes — elle passe toujours avant une brûlure ou une luxation.');
+        return;
+      }
+      terrainRecap.push({ok:true,text:'Priorité correcte : hémorragie du Cas B traitée en premier'});
+      feedbackThenNext('Bon réflexe — une hémorragie en jet tue plus vite qu\'une brûlure ou une luxation.',stagePansement);
+    });
+    grid.appendChild(card);
+  });
+  box.appendChild(grid);
+  runTimer(12,function(){
+    terrainRecap.push({ok:false,text:'Hésitation trop longue face aux trois blessés'});
+    terrainFail('Tu as trop hésité. Le Cas B s\'est vidé de son sang pendant que tu observais la scène. Sur le terrain, l\'hésitation tue autant qu\'une mauvaise décision.');
+  });
+}
+
+function stagePansement(){
+  el('timerStageLbl').textContent='Le pansement est traversé par le sang';
+  el('scenarioLabel').textContent='Cas B — Hémorragie au mollet';
+  el('scenarioText').textContent='Tu as posé un pansement compressif. Quelques secondes plus tard, le sang le traverse complètement.';
+  el('stageTitle').textContent='Que fais-tu ?';
+  var box=el('stageContent');box.innerHTML='';
+  var opts=[
+    {t:'Ajouter un second pansement par-dessus, sans retirer le premier',ok:true},
+    {t:'Retirer le premier pansement et le remplacer par un neuf',ok:false},
+    {t:'Ne rien faire, ça va s\'arrêter tout seul',ok:false}
+  ];
+  opts.sort(function(){return Math.random()-0.5;});
+  opts.forEach(function(o){
+    var b=document.createElement('button');b.className='choice';b.textContent=o.t;
+    b.addEventListener('click',function(){
+      clearTimer();
+      if(!o.ok){
+        terrainRecap.push({ok:false,text:'Erreur sur le pansement traversé'});
+        terrainFail('En retirant le pansement, tu as rompu la coagulation déjà amorcée. L\'hémorragie repart de plus belle. Il fallait empiler un second pansement par-dessus, sans jamais retirer le premier.');
+        return;
+      }
+      terrainRecap.push({ok:true,text:'Second pansement ajouté sans retirer le premier'});
+      feedbackThenNext('Correct — on empile toujours par-dessus pour ne pas rompre la coagulation.',stageGarrot);
+    });
+    box.appendChild(b);
+  });
+  runTimer(10,function(){
+    terrainRecap.push({ok:false,text:'Trop lent face au pansement traversé'});
+    terrainFail('Tu as mis trop de temps à réagir — l\'hémorragie a continué pendant ton hésitation.');
+  });
+}
+
+function stageGarrot(){
+  el('timerStageLbl').textContent='L\'hémorragie continue malgré le pansement';
+  el('scenarioLabel').textContent='Cas B — Hémorragie au mollet';
+  el('scenarioText').textContent='Le saignement ne ralentit pas. Il faut poser un garrot immédiatement.';
+  el('stageTitle').textContent='Où poses-tu le garrot ?';
+  var box=el('stageContent');box.innerHTML='';
+  var opts=[
+    {t:'À la racine de la cuisse, au plus près du tronc',ok:true},
+    {t:'À la cheville, juste à côté de la plaie',ok:false},
+    {t:'Directement sur la plaie du mollet',ok:false}
+  ];
+  opts.sort(function(){return Math.random()-0.5;});
+  opts.forEach(function(o){
+    var b=document.createElement('button');b.className='choice';b.textContent=o.t;
+    b.addEventListener('click',function(){
+      clearTimer();
+      if(!o.ok){
+        terrainRecap.push({ok:false,text:'Garrot mal positionné'});
+        terrainFail('Un garrot posé trop près de la plaie ou dessus ne comprime pas les gros vaisseaux — l\'hémorragie continue. Le garrot doit toujours être posé à la racine du membre, au plus près du tronc.');
+        return;
+      }
+      window.__garrotTime=new Date().toLocaleTimeString();
+      terrainRecap.push({ok:true,text:'Garrot posé correctement à la racine de la cuisse'});
+      feedbackThenNext('Correct — le garrot à la racine comprime efficacement les gros vaisseaux.',stageLuxation);
+    });
+    box.appendChild(b);
+  });
+  runTimer(10,function(){
+    terrainRecap.push({ok:false,text:'Trop lent à poser le garrot'});
+    terrainFail('Trop de temps perdu — le patient a sombré en choc hémorragique avant la pose du garrot.');
+  });
+}
+
+function stageLuxation(){
+  el('timerStageLbl').textContent='Le blessé supplie qu\'on le soulage';
+  el('scenarioLabel').textContent='Cas C — Épaule déboîtée';
+  el('scenarioText').textContent='"S\'il te plaît, remets-la en place, je peux pas la bouger !" Le patient insiste, en larmes.';
+  el('stageTitle').textContent='Que fais-tu ?';
+  var box=el('stageContent');box.innerHTML='';
+  var opts=[
+    {t:'Immobiliser l\'épaule sans tenter de la remettre en place',ok:true},
+    {t:'Tirer sur le bras pour remettre l\'articulation en place',ok:false},
+    {t:'Ignorer sa demande et partir voir le Cas A',ok:false}
+  ];
+  opts.sort(function(){return Math.random()-0.5;});
+  opts.forEach(function(o){
+    var b=document.createElement('button');b.className='choice';b.textContent=o.t;
+    b.addEventListener('click',function(){
+      clearTimer();
+      if(!o.ok){
+        if(o.t.indexOf('Tirer')===0){
+          terrainRecap.push({ok:false,text:'Tentative de réduction sans formation'});
+          terrainFail('Une réduction de luxation sans formation adéquate peut sectionner un nerf ou un vaisseau. Ce geste est réservé aux grades formés — ici, il fallait seulement immobiliser.');
+        } else {
+          terrainRecap.push({ok:false,text:'Patient laissé sans immobilisation'});
+          terrainFail('Laisser une luxation sans immobilisation expose le patient à une aggravation de la blessure au moindre mouvement.');
+        }
+        return;
+      }
+      terrainRecap.push({ok:true,text:'Épaule immobilisée sans manipulation'});
+      feedbackThenNext('Correct — on immobilise et on transmet, on ne tente jamais de réduire sans formation.',stageBrulure);
+    });
+    box.appendChild(b);
+  });
+  runTimer(10,function(){
+    terrainRecap.push({ok:false,text:'Trop lent face à la luxation'});
+    terrainFail('Ton hésitation a laissé le patient se débattre — l\'articulation a subi des dommages supplémentaires.');
+  });
+}
+
+function stageBrulure(){
+  el('timerStageLbl').textContent='Dernier soin — la brûlure du bras';
+  el('scenarioLabel').textContent='Cas A — Brûlure au bras';
+  el('scenarioText').textContent='Des cloques se sont formées sur la brûlure du 2e degré. Le patient attend patiemment son tour.';
+  el('stageTitle').textContent='Que fais-tu ?';
+  var box=el('stageContent');box.innerHTML='';
+  var opts=[
+    {t:'Refroidir 20 minutes à l\'eau fraîche, sans percer les cloques',ok:true},
+    {t:'Percer les cloques pour évacuer le liquide',ok:false},
+    {t:'Appliquer un pansement bien serré directement dessus',ok:false}
+  ];
+  opts.sort(function(){return Math.random()-0.5;});
+  opts.forEach(function(o){
+    var b=document.createElement('button');b.className='choice';b.textContent=o.t;
+    b.addEventListener('click',function(){
+      clearTimer();
+      if(!o.ok){
+        terrainRecap.push({ok:false,text:'Erreur sur la prise en charge de la brûlure'});
+        terrainFail('Percer une cloque ou trop serrer le pansement ouvre la porte aux infections. Il fallait refroidir 20 minutes et poser un pansement non serré.');
+        return;
+      }
+      terrainRecap.push({ok:true,text:'Brûlure refroidie correctement, cloques préservées'});
+      terrainPassed=true;
+      finishAll(null);
+    });
+    box.appendChild(b);
+  });
+  runTimer(10,function(){
+    terrainRecap.push({ok:false,text:'Trop lent sur la brûlure'});
+    terrainFail('Trop de temps perdu sur ce dernier soin — la fumée toxique ambiante a fini par affecter le patient.');
+  });
+}
+
+/* ═══════════════════ PARTIE 3 : BILAN ═══════════════════ */
+function finishAll(failReason){
+  clearTimer();
+  el('ph2').classList.remove('active');el('ph2').classList.add('done');
+  el('ph3').classList.add('active');
+  el('fieldScreen').style.display='none';
+  el('endScreen').style.display='block';
+
+  var theorieOk=qcmPct>=PASS_PCT;
+  var overallPass=theorieOk&&terrainPassed;
+
+  var badge=el('verdictBadge');
+  if(overallPass){
+    badge.innerHTML='<div class="verdict-badge pass">APTE AU TERRAIN</div>';
+    el('finalVerdict').textContent='Les deux parties de l\'évaluation sont réussies. Certifié pour une intervention en zone active.';
+  } else {
+    badge.innerHTML='<div class="verdict-badge fail">FORMATION COMPLÉMENTAIRE REQUISE</div>';
+    var reasons=[];
+    if(!theorieOk)reasons.push('le seuil théorique de 80 % n\'est pas atteint');
+    if(!terrainPassed)reasons.push(failReason||'l\'épreuve de terrain n\'a pas été validée');
+    el('finalVerdict').textContent='Non certifié : '+reasons.join(' et ')+'. Revois les 4 Fondamentaux et les Protocoles d\'urgence avant tout déploiement.';
+  }
+
+  var srT=el('srTheorie');
+  srT.textContent=qcmPct+' %';srT.className='sr-value '+(theorieOk?'pass':'fail');
+  var srF=el('srTerrain');
+  srF.textContent=terrainPassed?'Réussi':'Échoué';srF.className='sr-value '+(terrainPassed?'pass':'fail');
+
+  var list=el('recapList');list.innerHTML='';
+  for(var i=0;i<results.length;i++){
+    var d=document.createElement('div');d.className='recap-item';
+    var n=document.createElement('span');n.className='rname';n.textContent='Q'+(i+1)+' — '+cases[i].answer;
+    var t=document.createElement('span');t.className='rtag '+(results[i]?'rok':'rfail');t.textContent=results[i]?'Correct':'Incorrect';
+    d.appendChild(n);d.appendChild(t);list.appendChild(d);
+  }
+
+  if(terrainRecap.length){
+    el('terrainRecapPanel').style.display='';
+    var tlist=el('stepRecapList');tlist.innerHTML='';
+    terrainRecap.forEach(function(r){
+      var li=document.createElement('li');
+      if(!r.ok)li.className='bad';
+      li.textContent=r.text;
+      tlist.appendChild(li);
+    });
+  }
+
+  if(terrainPassed){
+    el('fichePanel').style.display='';
+    el('ficheName').textContent=playerName;
+    el('ficheHeure').textContent=window.__garrotTime||'—';
+    var elapsed=Math.round((Date.now()-fieldStartTime)/1000);
+    el('ficheTemps').textContent=elapsed+' secondes';
+  }
+
+  saveScore(overallPass,qcmPct,terrainPassed);
+}
+
+function saveScore(overallPass,pct,fieldPassed){
+  var grade;
+  if(pct>=90)grade='S';else if(pct>=80)grade='A';else if(pct>=60)grade='B';
+  else if(pct>=40)grade='C';else grade='D';
+  if(typeof SUPABASE_URL==='undefined')return;
+  try{
+    var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+    sb.from('eval_secouriste_scores').insert([{name:playerName,score:pct,grade:grade,correct:score,total:NB,terrain_reussi:!!fieldPassed,apte:overallPass}]).then(function(){},function(){});
+  }catch(e){}
+}
+})();
+</script>
+</body>
+</html>
