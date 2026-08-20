@@ -103,6 +103,18 @@ h1{font-family:'Cinzel',serif;font-weight:900;font-size:clamp(1.5rem,4.5vw,2.3re
 footer{text-align:center;margin-top:30px;color:var(--sand-deep);font-style:italic;}
 footer .seal{color:var(--ocre);font-family:'Cinzel',serif;}
 @media(max-width:480px){.panel{padding:16px 14px;}.case-text{font-size:1rem;}}
+
+.q-icon{width:56px;height:56px;border-radius:50%;margin:0 auto 10px;
+  background:radial-gradient(circle,rgba(181,113,43,.22),rgba(20,12,4,.5));
+  border:2px solid var(--ocre);display:flex;align-items:center;justify-content:center;
+  font-size:1.8rem;box-shadow:inset 0 0 16px rgba(0,0,0,.35);}
+.choice-letter{display:inline-flex;align-items:center;justify-content:center;
+  width:24px;height:24px;border-radius:50%;background:rgba(181,113,43,.25);
+  border:1px solid rgba(181,113,43,.5);color:var(--gold);font-family:'Cinzel',serif;
+  font-weight:700;font-size:.78rem;margin-right:10px;flex-shrink:0;vertical-align:middle;}
+.choice.correct .choice-letter{background:rgba(61,220,132,.25);border-color:var(--chakra);color:var(--chakra-glow);}
+.choice.wrong .choice-letter{background:rgba(196,69,58,.25);border-color:var(--blood-light);color:#ffcaa0;}
+.choice.sel .choice-letter{background:rgba(255,216,107,.3);border-color:var(--gold);}
 </style>
 </head>
 <body>
@@ -140,6 +152,7 @@ footer .seal{color:var(--ocre);font-family:'Cinzel',serif;}
     <div class="panel">
       <h2 id="caseTitle">Question 1 / 12</h2>
       <div class="case-box">
+        <div class="q-icon" id="qIcon"></div>
         <div class="case-label">Question</div>
         <div class="case-text" id="caseText"></div>
       </div>
@@ -172,62 +185,62 @@ var el=function(id){return document.getElementById(id);};
 function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
 
 var POOL=[
-  {situation:"Combien de points de tenketsu compte le corps d'un shinobi ?",
+  {icon:"💠",situation:"Combien de points de tenketsu compte le corps d'un shinobi ?",
    answer:"361",
    opts:["361","362","360","365"],
    explain:"Le corps humain compte 361 tenketsu — le même nombre que les points sur un plateau de Go, souvent cité comme référence dans l'univers."},
 
-  {situation:"Quelle technique permet d'explorer l'intérieur du corps d'un patient sans incision, pour détecter fractures, hémorragies et poisons ?",
+  {icon:"🩸",situation:"Quelle technique permet d'explorer l'intérieur du corps d'un patient sans incision, pour détecter fractures, hémorragies et poisons ?",
    answer:"Kaiseki Kenshin",
    opts:["Kaiseki Kenshin","Scalpel de Chakra","Paume Mystique","Dokunoki no Jutsu"],
    explain:"Le Kaiseki Kenshin est la technique d'analyse médicale de diagnostic — la première étape de tout examen approfondi."},
 
-  {situation:"Quel apprentissage est obligatoire pour tout médecin débutant afin d'affiner sa précision de chakra ?",
+  {icon:"🥋",situation:"Quel apprentissage est obligatoire pour tout médecin débutant afin d'affiner sa précision de chakra ?",
    answer:"Manipulation du Chakra Médicale",
    opts:["Manipulation du Chakra Médicale","Hone no Sasei","Inyushumetsu","Paume Spirituelle"],
    explain:"C'est la base indispensable avant d'apprendre toute technique médicale supérieure."},
 
-  {situation:"Un genin arrive avec une petite entaille superficielle. Quelle technique Aspirant, rapide mais limitée, est adaptée ?",
+  {icon:"🥋",situation:"Un genin arrive avec une petite entaille superficielle. Quelle technique Aspirant, rapide mais limitée, est adaptée ?",
    answer:"Paume Spirituelle",
    opts:["Paume Spirituelle","Paume Mystique","Inyushumetsu","Hone no Sasei"],
    explain:"La Paume Spirituelle régénère les tissus superficiels par projection de chakra sur courte distance — parfaite sur le champ de bataille, mais insuffisante pour de grandes blessures."},
 
-  {situation:"Quelle technique Adepte extrait un poison via deux incisions et une bulle de chakra aqueux ?",
+  {icon:"☠️",situation:"Quelle technique Adepte extrait un poison via deux incisions et une bulle de chakra aqueux ?",
    answer:"Dokunoki no Jutsu",
    opts:["Dokunoki no Jutsu","Inyushumetsu","Kaiseki Kenshin","Scalpel de Chakra"],
    explain:"Une première plaie introduit la bulle qui encapsule le poison, une seconde sert de voie de sortie."},
 
-  {situation:"Quelle technique cicatrise très vite grâce à du chakra en ébullition, mais est extrêmement douloureuse pour le patient ?",
+  {icon:"🥋",situation:"Quelle technique cicatrise très vite grâce à du chakra en ébullition, mais est extrêmement douloureuse pour le patient ?",
    answer:"Inyushumetsu",
    opts:["Inyushumetsu","Paume Spirituelle","Dokunoki no Jutsu","Hone no Sasei"],
    explain:"Inyushumetsu n'est utilisée qu'en dernier recours à cause de la douleur infligée au patient."},
 
-  {situation:"Quelle technique Expert accélère la régénération cellulaire par les paumes mais ne remplace pas une opération chirurgicale ?",
+  {icon:"🔪",situation:"Quelle technique Expert accélère la régénération cellulaire par les paumes mais ne remplace pas une opération chirurgicale ?",
    answer:"Paume Mystique",
    opts:["Paume Mystique","Paume Spirituelle","Scalpel de Chakra","Dokunoki no Jutsu"],
    explain:"La Paume Mystique referme les plaies et répare les tissus mous, mais ne réaligne pas les os ni ne retire les fragments — c'est un complément à la chirurgie."},
 
-  {situation:"Quelle technique forme une lame de chakra si fine qu'elle ne laisse aucune incision visible sur la peau ?",
+  {icon:"🥋",situation:"Quelle technique forme une lame de chakra si fine qu'elle ne laisse aucune incision visible sur la peau ?",
    answer:"Scalpel de Chakra",
    opts:["Scalpel de Chakra","Hone no Sasei","Kaiseki Kenshin","Paume Mystique"],
    explain:"Un geste mal ajusté avec le Scalpel de Chakra peut sectionner un vaisseau, un nerf ou un organe — précision absolue requise."},
 
-  {situation:"Quelle technique soude les cartilages et microfractures osseuses, sans pouvoir réparer un os brisé ?",
+  {icon:"🦴",situation:"Quelle technique soude les cartilages et microfractures osseuses, sans pouvoir réparer un os brisé ?",
    answer:"Hone no Sasei",
    opts:["Hone no Sasei","Inyushumetsu","Paume Mystique","Dokunoki no Jutsu"],
    explain:"Hone no Sasei fatigue énormément l'utilisateur — elle doit être utilisée avec parcimonie, en complément d'une opération."},
 
-  {situation:"Quelle artère faut-il comprimer pour poser un garrot efficace au niveau de l'aine ?",
+  {icon:"🩸",situation:"Quelle artère faut-il comprimer pour poser un garrot efficace au niveau de l'aine ?",
    answer:"Artère fémorale",
    opts:["Artère fémorale","Artère carotide","Artère radiale","Artère brachiale"],
    explain:"L'artère fémorale irrigue la jambe entière — son point de compression à l'aine est la référence pour un garrot de cuisse."},
 
-  {situation:"Quelle zone du corps un Aspirant ne doit jamais toucher sans supervision d'un Expert ou Maître ?",
+  {icon:"📋",situation:"Quelle zone du corps un Aspirant ne doit jamais toucher sans supervision d'un Expert ou Maître ?",
    answer:"Le cou / la gorge",
    opts:["Le cou / la gorge","L'avant-bras","Le mollet","Les mains"],
    explain:"Le cou concentre les artères carotides, la trachée et la moelle épinière — toute erreur y est potentiellement fatale."},
 
-  {situation:"Quel dôjutsu offre une vision à 360° et la perception directe du réseau de chakra ?",
+  {icon:"👁️",situation:"Quel dôjutsu offre une vision à 360° et la perception directe du réseau de chakra ?",
    answer:"Byakugan",
    opts:["Byakugan","Sharingan","Rinnegan","Aucun de ces yeux"],
    explain:"Le Byakugan est réputé pour sa vision quasi omnidirectionnelle et sa capacité à voir les tenketsu et les circuits de chakra."}
@@ -257,10 +270,12 @@ function loadCase(){
   var c=cases[ci];validated=false;selected=null;
   el('caseTitle').textContent='Question '+(ci+1)+' / '+NB;
   el('caseText').textContent=c.situation;
+  el('qIcon').textContent=c.icon||'📋';
   var box=el('choicesBox');box.innerHTML='';
   var opts=shuffle(c.opts);
-  opts.forEach(function(o){
-    var btn=document.createElement('button');btn.className='choice';btn.textContent=o;
+  opts.forEach(function(o,oi){
+    var btn=document.createElement('button');btn.className='choice';
+    btn.innerHTML='<span class="choice-letter">'+String.fromCharCode(65+oi)+'</span>'+o;
     btn.setAttribute('data-val',o);
     btn.addEventListener('click',function(){if(validated)return;selectChoice(o);});
     box.appendChild(btn);

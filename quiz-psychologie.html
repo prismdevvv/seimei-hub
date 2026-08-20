@@ -96,6 +96,18 @@ h1{font-family:'Cinzel',serif;font-weight:900;font-size:clamp(1.5rem,4.5vw,2.3re
 footer{text-align:center;margin-top:30px;color:var(--sand-deep);font-style:italic;}
 footer .seal{color:var(--ocre);font-family:'Cinzel',serif;}
 @media(max-width:480px){.panel{padding:16px 14px;}.case-text{font-size:1rem;}}
+
+.q-icon{width:56px;height:56px;border-radius:50%;margin:0 auto 10px;
+  background:radial-gradient(circle,rgba(181,113,43,.22),rgba(20,12,4,.5));
+  border:2px solid var(--ocre);display:flex;align-items:center;justify-content:center;
+  font-size:1.8rem;box-shadow:inset 0 0 16px rgba(0,0,0,.35);}
+.choice-letter{display:inline-flex;align-items:center;justify-content:center;
+  width:24px;height:24px;border-radius:50%;background:rgba(181,113,43,.25);
+  border:1px solid rgba(181,113,43,.5);color:var(--gold);font-family:'Cinzel',serif;
+  font-weight:700;font-size:.78rem;margin-right:10px;flex-shrink:0;vertical-align:middle;}
+.choice.correct .choice-letter{background:rgba(61,220,132,.25);border-color:var(--chakra);color:var(--chakra-glow);}
+.choice.wrong .choice-letter{background:rgba(196,69,58,.25);border-color:var(--blood-light);color:#ffcaa0;}
+.choice.sel .choice-letter{background:rgba(255,216,107,.3);border-color:var(--gold);}
 </style>
 </head>
 <body>
@@ -136,6 +148,7 @@ footer .seal{color:var(--ocre);font-family:'Cinzel',serif;}
     <div class="panel">
       <h2 id="caseTitle">Question 1 / 10</h2>
       <div class="case-box">
+        <div class="q-icon" id="qIcon"></div>
         <div class="case-label">Question</div>
         <div class="case-text" id="caseText"></div>
       </div>
@@ -168,52 +181,52 @@ var el=function(id){return document.getElementById(id);};
 function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
 
 var POOL=[
-  {situation:"Quel trouble se caractérise par des reviviscences, cauchemars et hypervigilance après un combat violent ?",
+  {icon:"📋",situation:"Quel trouble se caractérise par des reviviscences, cauchemars et hypervigilance après un combat violent ?",
    answer:"Le stress post-traumatique (SSPT)",
    opts:["Le stress post-traumatique (SSPT)","La dissociation post-genjutsu","Le burnout","Le deuil traumatique"],
    explain:"Le SSPT se manifeste par des reviviscences répétées et une hypervigilance après un événement traumatique."},
 
-  {situation:"Face à des idées noires ou suicidaires exprimées par un patient, quelle est la règle absolue ?",
+  {icon:"📋",situation:"Face à des idées noires ou suicidaires exprimées par un patient, quelle est la règle absolue ?",
    answer:"Ne jamais le laisser seul et alerter immédiatement un gradé",
    opts:["Ne jamais le laisser seul et alerter immédiatement un gradé","Attendre la prochaine séance pour en reparler","Minimiser si le ton semblait léger","Le laisser gérer seul, ça passera"],
    explain:"Tout propos suicidaire doit être pris au sérieux, même allégé — c'est une urgence absolue."},
 
-  {situation:"Dans quel cas le secret professionnel du psychologue peut-il être rompu ?",
+  {icon:"🧠",situation:"Dans quel cas le secret professionnel du psychologue peut-il être rompu ?",
    answer:"En cas de danger immédiat pour le patient ou pour autrui",
    opts:["En cas de danger immédiat pour le patient ou pour autrui","Si le gérant le demande par curiosité","Jamais, sous aucun prétexte","Si la mission est jugée prioritaire"],
    explain:"Le secret professionnel n'est levé qu'en cas de danger immédiat — c'est la seule exception au cadre de confiance."},
 
-  {situation:"Quel trouble touche un shinobi après une illusion (genjutsu) prolongée ou violente ?",
+  {icon:"🧠",situation:"Quel trouble touche un shinobi après une illusion (genjutsu) prolongée ou violente ?",
    answer:"La dissociation post-genjutsu",
    opts:["La dissociation post-genjutsu","Le SSPT","Le burnout","La décompensation en mission"],
    explain:"La dissociation post-genjutsu se traduit par une confusion et un détachement de la réalité après une illusion intense."},
 
-  {situation:"Quelle technique d'entretien consiste à laisser parler sans interrompre et à reformuler ?",
+  {icon:"🥋",situation:"Quelle technique d'entretien consiste à laisser parler sans interrompre et à reformuler ?",
    answer:"L'écoute active",
    opts:["L'écoute active","La verbalisation encadrée","Le désamorçage post-mission","L'ancrage & respiration"],
    explain:"L'écoute active montre au patient que le psychologue comprend son récit, sans le couper."},
 
-  {situation:"Comment appelle-t-on l'entretien court réalisé juste après un événement difficile, avant que le choc ne s'installe ?",
+  {icon:"📋",situation:"Comment appelle-t-on l'entretien court réalisé juste après un événement difficile, avant que le choc ne s'installe ?",
    answer:"Le désamorçage post-mission",
    opts:["Le désamorçage post-mission","La thérapie brève","L'ancrage & respiration","La verbalisation encadrée"],
    explain:"Le désamorçage post-mission intervient au plus tôt, avant l'installation durable du choc psychologique."},
 
-  {situation:"Le burnout (épuisement chronique) chez le shinobi est principalement causé par...",
+  {icon:"🧠",situation:"Le burnout (épuisement chronique) chez le shinobi est principalement causé par...",
    answer:"la sur-sollicitation en chakra et en missions",
    opts:["la sur-sollicitation en chakra et en missions","une seule mauvaise nuit de sommeil","un excès de repos","une blessure physique mineure"],
    explain:"Le burnout résulte d'une accumulation de fatigue mentale et de sur-sollicitation prolongée."},
 
-  {situation:"Face à une crise d'angoisse (respiration rapide, oppression), que fait le psychologue en priorité ?",
+  {icon:"🫁",situation:"Face à une crise d'angoisse (respiration rapide, oppression), que fait le psychologue en priorité ?",
    answer:"Isoler la personne et guider sa respiration calmement",
    opts:["Isoler la personne et guider sa respiration calmement","La laisser seule pour qu'elle se calme","Élever la voix pour capter son attention","L'envoyer directement en mission"],
    explain:"Isoler et guider la respiration aide la personne à reprendre le contrôle progressivement."},
 
-  {situation:"Une décompensation en mission (panique soudaine, dissociation) nécessite en premier lieu de...",
+  {icon:"📋",situation:"Une décompensation en mission (panique soudaine, dissociation) nécessite en premier lieu de...",
    answer:"mettre le shinobi en sécurité et le retirer de la mission",
    opts:["mettre le shinobi en sécurité et le retirer de la mission","continuer la mission malgré tout","le confronter directement à la source du stress","ignorer le comportement pour ne pas déranger"],
    explain:"La priorité est la sécurité immédiate — la réévaluation vient avant tout retour en service."},
 
-  {situation:"Quel principe éthique guide le psychologue face aux actes commis en mission par son patient ?",
+  {icon:"🧠",situation:"Quel principe éthique guide le psychologue face aux actes commis en mission par son patient ?",
    answer:"La neutralité — se concentrer sur l'état mental sans juger",
    opts:["La neutralité — se concentrer sur l'état mental sans juger","Le jugement moral systématique","Le rapport immédiat à la hiérarchie","Le refus de traiter certains patients"],
    explain:"Le psychologue ne juge jamais les actes de mission — son rôle est l'évaluation de l'état mental."}
@@ -243,10 +256,12 @@ function loadCase(){
   var c=cases[ci];validated=false;selected=null;
   el('caseTitle').textContent='Question '+(ci+1)+' / '+NB;
   el('caseText').textContent=c.situation;
+  el('qIcon').textContent=c.icon||'📋';
   var box=el('choicesBox');box.innerHTML='';
   var opts=shuffle(c.opts);
-  opts.forEach(function(o){
-    var btn=document.createElement('button');btn.className='choice';btn.textContent=o;
+  opts.forEach(function(o,oi){
+    var btn=document.createElement('button');btn.className='choice';
+    btn.innerHTML='<span class="choice-letter">'+String.fromCharCode(65+oi)+'</span>'+o;
     btn.setAttribute('data-val',o);
     btn.addEventListener('click',function(){if(validated)return;selectChoice(o);});
     box.appendChild(btn);

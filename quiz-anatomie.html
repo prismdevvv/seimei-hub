@@ -96,6 +96,18 @@ h1{font-family:'Cinzel',serif;font-weight:900;font-size:clamp(1.5rem,4.5vw,2.3re
 footer{text-align:center;margin-top:30px;color:var(--sand-deep);font-style:italic;}
 footer .seal{color:var(--ocre);font-family:'Cinzel',serif;}
 @media(max-width:480px){.panel{padding:16px 14px;}.case-text{font-size:1rem;}}
+
+.q-icon{width:56px;height:56px;border-radius:50%;margin:0 auto 10px;
+  background:radial-gradient(circle,rgba(181,113,43,.22),rgba(20,12,4,.5));
+  border:2px solid var(--ocre);display:flex;align-items:center;justify-content:center;
+  font-size:1.8rem;box-shadow:inset 0 0 16px rgba(0,0,0,.35);}
+.choice-letter{display:inline-flex;align-items:center;justify-content:center;
+  width:24px;height:24px;border-radius:50%;background:rgba(181,113,43,.25);
+  border:1px solid rgba(181,113,43,.5);color:var(--gold);font-family:'Cinzel',serif;
+  font-weight:700;font-size:.78rem;margin-right:10px;flex-shrink:0;vertical-align:middle;}
+.choice.correct .choice-letter{background:rgba(61,220,132,.25);border-color:var(--chakra);color:var(--chakra-glow);}
+.choice.wrong .choice-letter{background:rgba(196,69,58,.25);border-color:var(--blood-light);color:#ffcaa0;}
+.choice.sel .choice-letter{background:rgba(255,216,107,.3);border-color:var(--gold);}
 </style>
 </head>
 <body>
@@ -136,6 +148,7 @@ footer .seal{color:var(--ocre);font-family:'Cinzel',serif;}
     <div class="panel">
       <h2 id="caseTitle">Question 1 / 10</h2>
       <div class="case-box">
+        <div class="q-icon" id="qIcon"></div>
         <div class="case-label">Question</div>
         <div class="case-text" id="caseText"></div>
       </div>
@@ -168,52 +181,52 @@ var el=function(id){return document.getElementById(id);};
 function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
 
 var POOL=[
-  {situation:"Combien de points de tenketsu compte le corps d'un shinobi ?",
+  {icon:"💠",situation:"Combien de points de tenketsu compte le corps d'un shinobi ?",
    answer:"361",
    opts:["361","362","360","365"],
    explain:"Le corps humain compte 361 tenketsu — le même nombre que les points sur un plateau de Go."},
 
-  {situation:"Quel organe, protégé par le sternum, provoque un arrêt en quelques minutes en cas de lésion ?",
+  {icon:"📋",situation:"Quel organe, protégé par le sternum, provoque un arrêt en quelques minutes en cas de lésion ?",
    answer:"Le cœur",
    opts:["Le cœur","Le foie","La rate","Les reins"],
    explain:"Une lésion cardiaque entraîne un arrêt en quelques minutes — c'est l'urgence absolue par excellence."},
 
-  {situation:"Quelle artère faut-il comprimer pour poser un garrot fémoral efficace ?",
+  {icon:"🩸",situation:"Quelle artère faut-il comprimer pour poser un garrot fémoral efficace ?",
    answer:"L'artère fémorale",
    opts:["L'artère fémorale","L'artère carotide","L'artère radiale","L'artère brachiale"],
    explain:"L'artère fémorale irrigue toute la jambe — son point de compression à l'aine est la référence du garrot de cuisse."},
 
-  {situation:"Quelle zone du corps un Aspirant ne doit-il jamais toucher sans supervision d'un Expert ?",
+  {icon:"📋",situation:"Quelle zone du corps un Aspirant ne doit-il jamais toucher sans supervision d'un Expert ?",
    answer:"Le cou / la gorge",
    opts:["Le cou / la gorge","L'avant-bras","Le mollet","Les mains"],
    explain:"Le cou concentre carotides, trachée et moelle épinière — toute erreur y est potentiellement fatale."},
 
-  {situation:"Où prend-on classiquement le pouls d'un patient ?",
+  {icon:"📋",situation:"Où prend-on classiquement le pouls d'un patient ?",
    answer:"À l'artère radiale (poignet)",
    opts:["À l'artère radiale (poignet)","À l'artère fémorale","À l'aorte","À l'artère carotide uniquement"],
    explain:"Le pouls radial, au poignet, est le point de prise le plus courant en pratique médicale."},
 
-  {situation:"Quel organe filtre le sang, neutralise les toxines et produit la bile ?",
+  {icon:"🟤",situation:"Quel organe filtre le sang, neutralise les toxines et produit la bile ?",
    answer:"Le foie",
    opts:["Le foie","Les reins","La rate","L'estomac"],
    explain:"Le foie est un organe très vascularisé — sa rupture cause une hémorragie interne massive."},
 
-  {situation:"Quel point de chakra est le point d'émission principal des techniques comme la Paume Spirituelle ?",
+  {icon:"🥋",situation:"Quel point de chakra est le point d'émission principal des techniques comme la Paume Spirituelle ?",
    answer:"Les paumes des mains",
    opts:["Les paumes des mains","Le plexus solaire","Le front","Le bout des doigts"],
    explain:"Les paumes des mains sont le point d'émission principal du chakra médical."},
 
-  {situation:"Perforation d'un poumon : quelle complication redouter en priorité ?",
+  {icon:"🫁",situation:"Perforation d'un poumon : quelle complication redouter en priorité ?",
    answer:"Un pneumothorax",
    opts:["Un pneumothorax","Une insuffisance rénale","Une péritonite","Une paralysie"],
    explain:"Une perforation pulmonaire provoque un pneumothorax et une détresse respiratoire."},
 
-  {situation:"Quel organe filtre le sang et produit l'urine, situé dans le bas du dos ?",
+  {icon:"💧",situation:"Quel organe filtre le sang et produit l'urine, situé dans le bas du dos ?",
    answer:"Les reins",
    opts:["Les reins","La vessie","La rate","L'intestin"],
    explain:"Les reins, de part et d'autre de la colonne vertébrale, filtrent le sang et produisent l'urine."},
 
-  {situation:"Quelle artère est la plus grosse du corps, dont la rupture entraîne une mort quasi immédiate ?",
+  {icon:"🩸",situation:"Quelle artère est la plus grosse du corps, dont la rupture entraîne une mort quasi immédiate ?",
    answer:"L'aorte",
    opts:["L'aorte","L'artère brachiale","L'artère radiale","L'artère fémorale"],
    explain:"L'aorte est la plus grosse artère du corps — sa rupture est presque toujours fatale immédiatement."}
@@ -243,10 +256,12 @@ function loadCase(){
   var c=cases[ci];validated=false;selected=null;
   el('caseTitle').textContent='Question '+(ci+1)+' / '+NB;
   el('caseText').textContent=c.situation;
+  el('qIcon').textContent=c.icon||'📋';
   var box=el('choicesBox');box.innerHTML='';
   var opts=shuffle(c.opts);
-  opts.forEach(function(o){
-    var btn=document.createElement('button');btn.className='choice';btn.textContent=o;
+  opts.forEach(function(o,oi){
+    var btn=document.createElement('button');btn.className='choice';
+    btn.innerHTML='<span class="choice-letter">'+String.fromCharCode(65+oi)+'</span>'+o;
     btn.setAttribute('data-val',o);
     btn.addEventListener('click',function(){if(validated)return;selectChoice(o);});
     box.appendChild(btn);

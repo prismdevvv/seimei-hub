@@ -104,6 +104,18 @@ h1{font-family:'Cinzel',serif;font-weight:900;font-size:clamp(1.5rem,4.5vw,2.3re
 footer{text-align:center;margin-top:30px;color:var(--sand-deep);font-style:italic;}
 footer .seal{color:var(--ocre);font-family:'Cinzel',serif;}
 @media(max-width:480px){.panel{padding:16px 14px;}.case-text{font-size:1rem;}}
+
+.q-icon{width:56px;height:56px;border-radius:50%;margin:0 auto 10px;
+  background:radial-gradient(circle,rgba(181,113,43,.22),rgba(20,12,4,.5));
+  border:2px solid var(--ocre);display:flex;align-items:center;justify-content:center;
+  font-size:1.8rem;box-shadow:inset 0 0 16px rgba(0,0,0,.35);}
+.choice-letter{display:inline-flex;align-items:center;justify-content:center;
+  width:24px;height:24px;border-radius:50%;background:rgba(181,113,43,.25);
+  border:1px solid rgba(181,113,43,.5);color:var(--gold);font-family:'Cinzel',serif;
+  font-weight:700;font-size:.78rem;margin-right:10px;flex-shrink:0;vertical-align:middle;}
+.choice.correct .choice-letter{background:rgba(61,220,132,.25);border-color:var(--chakra);color:var(--chakra-glow);}
+.choice.wrong .choice-letter{background:rgba(196,69,58,.25);border-color:var(--blood-light);color:#ffcaa0;}
+.choice.sel .choice-letter{background:rgba(255,216,107,.3);border-color:var(--gold);}
 </style>
 </head>
 <body>
@@ -141,6 +153,7 @@ footer .seal{color:var(--ocre);font-family:'Cinzel',serif;}
     <div class="panel">
       <h2 id="caseTitle">Cas 1 / 10</h2>
       <div class="case-box">
+        <div class="q-icon" id="qIcon"></div>
         <div class="case-label">Situation clinique</div>
         <div class="case-text" id="caseText"></div>
         <div class="case-symptoms" id="caseSym"></div>
@@ -174,91 +187,91 @@ var el=function(id){return document.getElementById(id);};
 function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
 
 var POOL=[
-  {situation:"Un shinobi revient de mission avec des maux de tête et des douleurs musculaires légères.",
+  {icon:"📋",situation:"Un shinobi revient de mission avec des maux de tête et des douleurs musculaires légères.",
    symptoms:"Céphalées, courbatures, température 37.8°C.",
    answer:"Saule blanc",
    opts:["Saule blanc","Pavot somnifère","Esmolol","Charbon actif"],
    explain:"Douleurs légères et fièvre modérée : le Saule blanc (effet aspirine) est le traitement adapté. Le Pavot serait disproportionné."},
 
-  {situation:"Un chunin a été gravement blessé au combat. Il hurle de douleur malgré les premiers soins, plaie profonde au flanc.",
+  {icon:"📋",situation:"Un chunin a été gravement blessé au combat. Il hurle de douleur malgré les premiers soins, plaie profonde au flanc.",
    symptoms:"Douleur intense (9/10), agitation, sueurs froides.",
    answer:"Pavot somnifère",
    opts:["Pavot somnifère","Saule blanc","Cataplasme froid","Aloe vera"],
    explain:"Douleur sévère post-combat : le Pavot somnifère (analgésique puissant) est nécessaire. Le Saule blanc serait insuffisant."},
 
-  {situation:"Un genin s'est brûlé l'avant-bras en s'approchant trop d'un jutsu Katon à l'entraînement.",
+  {icon:"📋",situation:"Un genin s'est brûlé l'avant-bras en s'approchant trop d'un jutsu Katon à l'entraînement.",
    symptoms:"Brûlure 1er degré, peau rouge, sèche, douloureuse.",
    answer:"Aloe vera",
    opts:["Aloe vera","Miel médical","Pavot somnifère","Quinquina"],
    explain:"Brûlure légère : l'Aloe vera (spécialité Suna) est le traitement de référence — anti-inflammatoire et cicatrisant naturel."},
 
-  {situation:"Un shinobi a ingéré un fruit empoisonné il y a 30 minutes lors d'une mission d'infiltration.",
+  {icon:"☠️",situation:"Un shinobi a ingéré un fruit empoisonné il y a 30 minutes lors d'une mission d'infiltration.",
    symptoms:"Nausées, crampes abdominales, début de vomissements.",
    answer:"Charbon actif",
    opts:["Charbon actif","Dokunoki no Jutsu","Artemisia annua","Saule blanc"],
    explain:"Poison ingéré récemment (< 2h) : le Charbon actif absorbe les toxines dans l'estomac. Le Dokunoki est plus adapté pour les poisons déjà dans le sang."},
 
-  {situation:"Un jonin a été piqué par un scorpion venimeux lors d'une mission dans le désert.",
+  {icon:"📋",situation:"Un jonin a été piqué par un scorpion venimeux lors d'une mission dans le désert.",
    symptoms:"Douleur locale intense, gonflement, fièvre légère montante.",
    answer:"Quinquina",
    opts:["Quinquina","Charbon actif","Cataplasme froid","Saule blanc"],
    explain:"Piqûre venimeuse : le Quinquina (antiparasitaire/antitoxine) neutralise les toxines. Le Charbon actif ne fonctionne que par ingestion."},
 
-  {situation:"Un patient présente une entorse de la cheville après une mauvaise réception de saut.",
+  {icon:"🦴",situation:"Un patient présente une entorse de la cheville après une mauvaise réception de saut.",
    symptoms:"Gonflement, douleur à la palpation, pas de fracture visible.",
    answer:"Cataplasme froid",
    opts:["Cataplasme froid","Pavot somnifère","Aloe vera","Paume Mystique"],
    explain:"Entorse avec gonflement : le Cataplasme froid (herbes broyées) est le traitement anti-inflammatoire adapté. Simple, accessible à tous les grades."},
 
-  {situation:"Un shinobi empoisonné par un kunai enduit. Le poison circule dans le sang depuis 20 minutes.",
+  {icon:"☠️",situation:"Un shinobi empoisonné par un kunai enduit. Le poison circule dans le sang depuis 20 minutes.",
    symptoms:"Engourdissement progressif du bras, vertiges, vision trouble.",
    answer:"Dokunoki no Jutsu",
    opts:["Dokunoki no Jutsu","Charbon actif","Quinquina","Saule blanc"],
    explain:"Poison dans le sang (pas ingéré) : le Dokunoki no Jutsu extrait le poison directement par bulle de chakra. Le Charbon actif ne fonctionne que par voie orale."},
 
-  {situation:"Un patient doit subir une suture au niveau du front après une coupure profonde.",
+  {icon:"📋",situation:"Un patient doit subir une suture au niveau du front après une coupure profonde.",
    symptoms:"Plaie ouverte nette de 4 cm, saignement maîtrisé.",
    answer:"Anesthésie locale par chakra",
    opts:["Anesthésie locale par chakra","Pavot somnifère","Esmolol","Charbon actif"],
    explain:"Avant une suture : l'Anesthésie locale par chakra engourdit la zone ciblée. Le Pavot (sédation générale) serait excessif pour un geste simple."},
 
-  {situation:"Un patient souffre de crampes abdominales après avoir mangé un repas trop épicé.",
+  {icon:"📋",situation:"Un patient souffre de crampes abdominales après avoir mangé un repas trop épicé.",
    symptoms:"Brûlures gastriques, ballonnements, inconfort digestif.",
    answer:"Cactus / Opuntia",
    opts:["Cactus / Opuntia","Charbon actif","Saule blanc","Artemisia annua"],
    explain:"Inflammation digestive : le Cactus (Opuntia) forme un gel protecteur pour l'estomac. Spécialité de Sunagakure, abondant dans le désert."},
 
-  {situation:"Des éraflures et petites coupures superficielles après un entraînement au taijutsu.",
+  {icon:"📋",situation:"Des éraflures et petites coupures superficielles après un entraînement au taijutsu.",
    symptoms:"Multiples écorchures, hématomes légers, rien de grave.",
    answer:"Paume Spirituelle",
    opts:["Paume Spirituelle","Paume Mystique","Pavot somnifère","Esmolol"],
    explain:"Blessures superficielles : la Paume Spirituelle (technique Aspirant) régénère les tissus légers. La Paume Mystique serait disproportionnée."},
 
-  {situation:"Un expert doit opérer une lésion interne et le patient doit être stabilisé pendant l'intervention.",
+  {icon:"📋",situation:"Un expert doit opérer une lésion interne et le patient doit être stabilisé pendant l'intervention.",
    symptoms:"Chirurgie programmée, rythme cardiaque à contrôler.",
    answer:"Esmolol",
    opts:["Esmolol","Pavot somnifère","Saule blanc","Cataplasme froid"],
    explain:"Contrôle cardiaque en chirurgie : l'Esmolol ralentit le rythme cardiaque. Réservé aux Experts — manipulation dangereuse."},
 
-  {situation:"Un shinobi revient d'une longue mission en zone marécageuse avec des fièvres récurrentes.",
+  {icon:"📋",situation:"Un shinobi revient d'une longue mission en zone marécageuse avec des fièvres récurrentes.",
    symptoms:"Fièvre intermittente, frissons, sueurs, fatigue extrême.",
    answer:"Artemisia annua",
    opts:["Artemisia annua","Saule blanc","Aloe vera","Charbon actif"],
    explain:"Fièvres parasitaires post-marécage : l'Artemisia annua (artémisinine) combat les parasites transmis par les insectes."},
 
-  {situation:"Une plaie chronique au mollet qui ne cicatrise pas depuis plusieurs jours malgré les soins.",
+  {icon:"📋",situation:"Une plaie chronique au mollet qui ne cicatrise pas depuis plusieurs jours malgré les soins.",
    symptoms:"Plaie ouverte, pas d'infection, cicatrisation bloquée.",
    answer:"Miel médical",
    opts:["Miel médical","Aloe vera","Cataplasme froid","Saule blanc"],
    explain:"Plaie chronique : le Miel médical est antiseptique et favorise la cicatrisation en milieu humide. L'Aloe vera est plus adapté aux plaies fraîches."},
 
-  {situation:"Un patient avec une lacération profonde au bras après un combat, les tissus internes sont exposés.",
+  {icon:"📋",situation:"Un patient avec une lacération profonde au bras après un combat, les tissus internes sont exposés.",
    symptoms:"Plaie profonde, muscles visibles, saignement important maîtrisé.",
    answer:"Paume Mystique",
    opts:["Paume Mystique","Paume Spirituelle","Aloe vera","Miel médical"],
    explain:"Plaie profonde avec tissus exposés : la Paume Mystique (Expert) régénère les tissus internes. La Paume Spirituelle ne traite que le superficiel."},
 
-  {situation:"Un chirurgien doit opérer un patient pendant 2 heures. Il faut une sédation complète.",
+  {icon:"🔪",situation:"Un chirurgien doit opérer un patient pendant 2 heures. Il faut une sédation complète.",
    symptoms:"Intervention longue programmée, patient conscient.",
    answer:"Pavot somnifère (dose contrôlée)",
    opts:["Pavot somnifère (dose contrôlée)","Anesthésie locale par chakra","Saule blanc","Cataplasme froid"],
@@ -289,11 +302,13 @@ function loadCase(){
   var c=cases[ci];validated=false;selected=null;
   el('caseTitle').textContent='Cas '+(ci+1)+' / '+NB;
   el('caseText').textContent=c.situation;
+  el('qIcon').textContent=c.icon||'📋';
   el('caseSym').textContent='Symptômes : '+c.symptoms;
   var box=el('choicesBox');box.innerHTML='';
   var opts=shuffle(c.opts);
-  opts.forEach(function(o){
-    var btn=document.createElement('button');btn.className='choice';btn.textContent=o;
+  opts.forEach(function(o,oi){
+    var btn=document.createElement('button');btn.className='choice';
+    btn.innerHTML='<span class="choice-letter">'+String.fromCharCode(65+oi)+'</span>'+o;
     btn.setAttribute('data-val',o);
     btn.addEventListener('click',function(){if(validated)return;selectChoice(o);});
     box.appendChild(btn);

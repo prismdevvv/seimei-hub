@@ -96,6 +96,18 @@ h1{font-family:'Cinzel',serif;font-weight:900;font-size:clamp(1.5rem,4.5vw,2.3re
 footer{text-align:center;margin-top:30px;color:var(--sand-deep);font-style:italic;}
 footer .seal{color:var(--ocre);font-family:'Cinzel',serif;}
 @media(max-width:480px){.panel{padding:16px 14px;}.case-text{font-size:1rem;}}
+
+.q-icon{width:56px;height:56px;border-radius:50%;margin:0 auto 10px;
+  background:radial-gradient(circle,rgba(181,113,43,.22),rgba(20,12,4,.5));
+  border:2px solid var(--ocre);display:flex;align-items:center;justify-content:center;
+  font-size:1.8rem;box-shadow:inset 0 0 16px rgba(0,0,0,.35);}
+.choice-letter{display:inline-flex;align-items:center;justify-content:center;
+  width:24px;height:24px;border-radius:50%;background:rgba(181,113,43,.25);
+  border:1px solid rgba(181,113,43,.5);color:var(--gold);font-family:'Cinzel',serif;
+  font-weight:700;font-size:.78rem;margin-right:10px;flex-shrink:0;vertical-align:middle;}
+.choice.correct .choice-letter{background:rgba(61,220,132,.25);border-color:var(--chakra);color:var(--chakra-glow);}
+.choice.wrong .choice-letter{background:rgba(196,69,58,.25);border-color:var(--blood-light);color:#ffcaa0;}
+.choice.sel .choice-letter{background:rgba(255,216,107,.3);border-color:var(--gold);}
 </style>
 </head>
 <body>
@@ -136,6 +148,7 @@ footer .seal{color:var(--ocre);font-family:'Cinzel',serif;}
     <div class="panel">
       <h2 id="caseTitle">Question 1 / 10</h2>
       <div class="case-box">
+        <div class="q-icon" id="qIcon"></div>
         <div class="case-label">Question</div>
         <div class="case-text" id="caseText"></div>
       </div>
@@ -168,52 +181,52 @@ var el=function(id){return document.getElementById(id);};
 function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
 
 var POOL=[
-  {situation:"Quelle plante du registre est la source historique de la morphine et de la codéine ?",
+  {icon:"🌿",situation:"Quelle plante du registre est la source historique de la morphine et de la codéine ?",
    answer:"Papaver somniferum (Pavot)",
    opts:["Papaver somniferum (Pavot)","Salix alba (Saule blanc)","Digitalis purpurea (Digitale)","Cinchona officinalis (Quinquina)"],
    explain:"Le Pavot est la source d'antidouleurs puissants comme la morphine — usage strictement contrôlé."},
 
-  {situation:"Quelle plante, spécialité de Sunagakure, est utilisée pour la cicatrisation et les soins de la peau ?",
+  {icon:"🌿",situation:"Quelle plante, spécialité de Sunagakure, est utilisée pour la cicatrisation et les soins de la peau ?",
    answer:"Aloe vera",
    opts:["Aloe vera","Taxus brevifolia","Oryza sativa","Artemisia annua"],
    explain:"L'Aloe vera, spécialité du désert de Suna, est un remède polyvalent pour la peau et l'inflammation."},
 
-  {situation:"Combien de paires de chromosomes possède l'être humain ?",
+  {icon:"🌿",situation:"Combien de paires de chromosomes possède l'être humain ?",
    answer:"23",
    opts:["23","46","21","12"],
    explain:"L'être humain possède 23 paires de chromosomes, soit 46 au total."},
 
-  {situation:"Quelles sont les 4 bases azotées composant l'ADN ?",
+  {icon:"🌿",situation:"Quelles sont les 4 bases azotées composant l'ADN ?",
    answer:"Adénine, Thymine, Cytosine, Guanine",
    opts:["Adénine, Thymine, Cytosine, Guanine","Oxygène, Azote, Carbone, Hydrogène","Glucose, Fructose, Ribose, Lactose","Sodium, Potassium, Calcium, Fer"],
    explain:"L'ADN est une double hélice composée des bases A, T, C et G."},
 
-  {situation:"Quelle plante du registre traite l'insuffisance cardiaque en régulant le rythme du cœur ?",
+  {icon:"❤️",situation:"Quelle plante du registre traite l'insuffisance cardiaque en régulant le rythme du cœur ?",
    answer:"Digitalis purpurea (Digitale pourpre)",
    opts:["Digitalis purpurea (Digitale pourpre)","Catharanthus roseus","Cinchona officinalis","Cactus / Opuntia"],
    explain:"La digitaline extraite de la Digitale renforce les contractions cardiaques et régule le rythme."},
 
-  {situation:"La vaporisation correspond à quel changement d'état de la matière ?",
+  {icon:"📋",situation:"La vaporisation correspond à quel changement d'état de la matière ?",
    answer:"Liquide vers Gaz",
    opts:["Liquide vers Gaz","Solide vers Liquide","Gaz vers Solide","Solide vers Gaz"],
    explain:"La vaporisation transforme un liquide en gaz, comme l'eau qui bout."},
 
-  {situation:"Quelle plante, seconde spécialité de Suna, protège l'estomac grâce à ses fibres mucilagineuses ?",
+  {icon:"🌿",situation:"Quelle plante, seconde spécialité de Suna, protège l'estomac grâce à ses fibres mucilagineuses ?",
    answer:"Cactus / Opuntia (Figuier de Barbarie)",
    opts:["Cactus / Opuntia (Figuier de Barbarie)","Artemisia annua","Salix alba","Taxus brevifolia"],
    explain:"Le Cactus / Opuntia forme un gel protecteur digestif, abondant dans le désert de Suna."},
 
-  {situation:"De quoi est composé le noyau de l'atome ?",
+  {icon:"🌿",situation:"De quoi est composé le noyau de l'atome ?",
    answer:"Protons et neutrons",
    opts:["Protons et neutrons","Uniquement des électrons","Protons et électrons","Neutrons et électrons"],
    explain:"Le noyau atomique regroupe protons (charge positive) et neutrons (neutres), entourés par les électrons."},
 
-  {situation:"Quelle plante fournit le taxol, utilisé en chimiothérapie contre certains cancers ?",
+  {icon:"🌿",situation:"Quelle plante fournit le taxol, utilisé en chimiothérapie contre certains cancers ?",
    answer:"Taxus brevifolia (If du Pacifique)",
    opts:["Taxus brevifolia (If du Pacifique)","Oryza sativa (Riz)","Cinchona officinalis (Quinquina)","Papaver somniferum (Pavot)"],
    explain:"Le taxol, extrait de l'écorce de l'If du Pacifique, est utilisé en chimiothérapie."},
 
-  {situation:"Quelle qualité essentielle pousse le scientifique à toujours vérifier ses résultats avant de les partager ?",
+  {icon:"📋",situation:"Quelle qualité essentielle pousse le scientifique à toujours vérifier ses résultats avant de les partager ?",
    answer:"L'esprit critique et la rigueur expérimentale",
    opts:["L'esprit critique et la rigueur expérimentale","La rapidité d'exécution","La discrétion absolue","L'improvisation"],
    explain:"L'esprit critique et la rigueur garantissent la fiabilité d'une observation avant de la partager ou de la publier."}
@@ -243,10 +256,12 @@ function loadCase(){
   var c=cases[ci];validated=false;selected=null;
   el('caseTitle').textContent='Question '+(ci+1)+' / '+NB;
   el('caseText').textContent=c.situation;
+  el('qIcon').textContent=c.icon||'📋';
   var box=el('choicesBox');box.innerHTML='';
   var opts=shuffle(c.opts);
-  opts.forEach(function(o){
-    var btn=document.createElement('button');btn.className='choice';btn.textContent=o;
+  opts.forEach(function(o,oi){
+    var btn=document.createElement('button');btn.className='choice';
+    btn.innerHTML='<span class="choice-letter">'+String.fromCharCode(65+oi)+'</span>'+o;
     btn.setAttribute('data-val',o);
     btn.addEventListener('click',function(){if(validated)return;selectChoice(o);});
     box.appendChild(btn);
