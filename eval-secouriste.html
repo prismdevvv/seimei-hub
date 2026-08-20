@@ -206,6 +206,10 @@ footer .seal{color:var(--ocre);font-family:'Cinzel',serif;}
 
   <!-- PARTIE 1 : QCM -->
   <div id="qcmScreen" style="display:none;">
+    <div class="timer-wrap">
+      <div class="timer-label"><span>Temps restant</span><span id="qcmTimerCount" class="t-alert">--</span></div>
+      <div class="timer-track"><div class="timer-fill" id="qcmTimerFill"></div></div>
+    </div>
     <div class="progress-bar" id="pbar"></div>
     <div class="score-bar">Score : <span class="val" id="scoreLbl">0 / 0</span></div>
     <div class="panel">
@@ -379,7 +383,7 @@ var POOL=[
    explain:"Un médecin d'élite est affecté en permanence à un Haut Gradé et ne doit jamais le laisser sans couverture médicale — même face à un blessé plus grave, la priorité reste de rester à son poste et de faire intervenir un autre secouriste."}
 ];
 
-var NB=15,cases=[],ci=0,score=0,results=[],selected=null,validated=false;
+var NB=15,QCM_TIME=20,cases=[],ci=0,score=0,results=[],selected=null,validated=false;
 
 el('startBtn').addEventListener('click',startQcm);
 el('valBtn').addEventListener('click',validate);
@@ -417,6 +421,7 @@ function loadCase(){
   el('explBox').className='explain';el('explBox').innerHTML='';
   el('scoreLbl').textContent=score+' / '+ci;
   updateBar();
+  runQcmTimer(QCM_TIME,function(){if(!validated)validate();});
 }
 
 function selectChoice(v){
@@ -428,6 +433,7 @@ function selectChoice(v){
 
 function validate(){
   if(validated)return;validated=true;
+  clearTimer();
   var c=cases[ci];
   var ok=(selected===c.answer);
   if(ok)score++;
@@ -478,9 +484,8 @@ function startField(){
 
 function clearTimer(){if(timerHandle)clearTimeout(timerHandle);if(timerInterval)clearInterval(timerInterval);}
 
-function runTimer(seconds,onExpire){
+function startCountdown(fill,countLbl,seconds,onExpire){
   clearTimer();
-  var fill=el('timerFill');var countLbl=el('timerCount');
   fill.style.transition='none';fill.style.width='100%';fill.className='timer-fill';
   void fill.offsetWidth;
   fill.style.transition='width '+seconds+'s linear';
@@ -493,6 +498,14 @@ function runTimer(seconds,onExpire){
     if(remaining<=0)clearInterval(timerInterval);
   },1000);
   timerHandle=setTimeout(function(){clearTimer();onExpire();},seconds*1000);
+}
+
+function runQcmTimer(seconds,onExpire){
+  startCountdown(el('qcmTimerFill'),el('qcmTimerCount'),seconds,onExpire);
+}
+
+function runTimer(seconds,onExpire){
+  startCountdown(el('timerFill'),el('timerCount'),seconds,onExpire);
 }
 
 function terrainFail(reason){
