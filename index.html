@@ -68,6 +68,16 @@ body::before{content:"";position:fixed;inset:0;opacity:.05;pointer-events:none;
   letter-spacing:.05em;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
 .section-title::before{content:"";width:7px;height:7px;background:var(--ocre);transform:rotate(45deg);}
 .modules{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;}
+.ex-cat{margin-bottom:36px;}
+.ex-cat:last-child{margin-bottom:0;}
+.ex-cat-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px;
+  padding-bottom:9px;border-bottom:1px solid rgba(181,113,43,.35);}
+.ex-cat-head h3{font-family:'Cinzel',serif;font-weight:900;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--sand-1);font-size:1.05rem;}
+.ex-cat-badge{font-family:'Cinzel',serif;font-weight:700;font-size:.65rem;padding:3px 10px;border-radius:6px;
+  text-transform:uppercase;letter-spacing:.05em;background:rgba(255,216,107,.15);
+  border:1px solid var(--gold);color:var(--gold);}
+.ex-cat-desc{font-size:.92rem;color:var(--sand-deep);margin:0 0 14px;line-height:1.4;}
 .module{background:linear-gradient(160deg,rgba(240,223,184,.08),rgba(60,41,20,.18));
   border:1px solid rgba(181,113,43,.5);border-radius:14px;padding:22px;cursor:pointer;
   transition:transform .25s,box-shadow .25s,border-color .25s;
@@ -234,92 +244,126 @@ footer .seal{color:var(--ocre);font-family:'Cinzel',serif;}
     <!-- EXERCICES -->
     <div class="section-view active" id="sec-exercices">
       <div class="section-title">Exercices pratiques</div>
-      <div class="modules">
-        <a href="sutures.html" class="module">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20c5-1 8-4 10-9"/><path d="M14 11l6-6"/><path d="M17 4.5 19.5 7"/></svg></div>
-          <h3>Sutures</h3><p>Pose tes points de suture avec pr&eacute;cision. 3 niveaux de difficult&eacute;.</p>
-        </a>
-        <a href="brulures.html" class="module">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c2 3 5 5 5 9a5 5 0 0 1-10 0c0-2 1-3.5 2.5-4.5C9 9.5 11 8 12 3Z"/></svg></div>
-          <h3>Br&ucirc;lures</h3><p>Refroidis la zone et r&egrave;gle la tension du pansement.</p>
-        </a>
-        <a href="quiz-anatomie.html" class="module">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 0 0-5 5c0 3 2 5.5 5 9 3-3.5 5-6 5-9a5 5 0 0 0-5-5z"/></svg></div>
-          <h3>Anatomie</h3><p>Localise l&rsquo;organe demand&eacute; sur le corps en un temps limit&eacute;.</p>
-        </a>
-        <a href="quiz-poisons.html" class="module">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v4H9z"/><rect x="5" y="7" width="14" height="14" rx="2"/><path d="M12 11v6"/><path d="M9 14h6"/></svg></div>
-          <h3>Dokunoki no Jutsu</h3><p>Guide la bulle de chakra le long de la veine sans d&eacute;vier.</p>
-        </a>
-        <a href="quiz-chirurgie.html" class="module">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.2"/><circle cx="6" cy="18" r="2.2"/><path d="M8 7.2 20 17M8 16.8 20 7"/></svg></div>
-          <h3>Chirurgie</h3><p>Suis l&rsquo;incision au scalpel sans d&eacute;vier pour extraire le corps &eacute;tranger.</p>
-        </a>
-        <a href="quiz-articulations.html" class="module">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15l6-6"/><circle cx="6.5" cy="17.5" r="2.2"/><circle cx="17.5" cy="6.5" r="2.2"/></svg></div>
-          <h3>Entorse</h3><p>Applique la glace puis sur&eacute;l&egrave;ve le membre &mdash; protocole RICE.</p>
-        </a>
-        <a href="quiz-recensement.html" class="module">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l3-3"/><path d="M5 19 15 9"/><path d="M12 6l6 6"/><path d="M14.5 3.5 20.5 9.5"/></svg></div>
-          <h3>Transfusion</h3><p>Glisse la poche de sang compatible jusqu&rsquo;au patient.</p>
-        </a>
-        <a href="quiz-botanique.html" class="module">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20h10"/><path d="M12 20v-6"/><path d="M12 14c-3 0-6-2.5-6-6 0-3.5 3-5.5 6-6 3 .5 6 2.5 6 6 0 3.5-3 6-6 6z"/></svg></div>
-          <h3>Botanique</h3><p>Glisse la bonne plante jusqu&rsquo;au patient selon le mal.</p>
-        </a>
-        <a href="quiz-psychologie.html" class="module">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2a5 5 0 0 0-5 5c0 1.5.5 2.5 1.5 3.5L4 14v3h2v3h3v-3h2l1.5-1.5"/></svg></div>
-          <h3>Psychologie</h3><p>R&eacute;agis avant que la d&eacute;tresse du patient n&rsquo;explose.</p>
-        </a>
-        <a href="quiz-ninjutsu.html" class="module">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg></div>
-          <h3>Ninjutsu M&eacute;dical</h3><p>Choisis la technique puis canalise ton chakra le temps voulu.</p>
-        </a>
-        <a href="quiz-fondamentaux.html" class="module">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 2.5 20h19L12 3.5Z"/></svg></div>
-          <h3>&Eacute;preuve des Fondamentaux</h3><p>4 stations ench&acirc;in&eacute;es : RCR, garrot, br&ucirc;lure, fracture.</p>
-        </a>
-        <a href="quiz-protocoles.html" class="module">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
-          <h3>Protocoles</h3><p>Arbre d&eacute;cisionnel d&rsquo;urgence, chaque &eacute;tape est chronom&eacute;tr&eacute;e.</p>
-        </a>
-        <a href="fractures.html" class="module">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15l6-6"/><circle cx="6.5" cy="17.5" r="2.2"/><circle cx="17.5" cy="6.5" r="2.2"/></svg></div>
-          <h3>Fractures</h3><p>Couvre la plaie sans toucher l&rsquo;os, puis r&egrave;gle la compression.</p>
-        </a>
-        <a href="quiz-pharma.html" class="module">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v4H9z"/><rect x="5" y="7" width="14" height="14" rx="2"/><path d="M12 11v6"/><path d="M9 14h6"/></svg></div>
-          <h3>Pharmacologie</h3><p>Choisis le rem&egrave;de et pr&eacute;pare la dose exacte &agrave; la seringue.</p>
-        </a>
-        <a href="attelles.html" class="module">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9.5" width="18" height="5" rx="2.5" transform="rotate(-45 12 12)"/><path d="M10 10l4 4M14 10l-4 4"/></svg></div>
-          <h3>Attelles</h3><p>Pose l&rsquo;attelle et fixe le bandage dans le bon ordre.</p>
-        </a>
-        <a href="rcr.html" class="module">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5 4.8 13a4.6 4.6 0 0 1 7.2-5.6A4.6 4.6 0 0 1 19.2 13Z"/><path d="M7.5 12h2l1.5-3 2 6 1.5-3h2"/></svg></div>
-          <h3>R&eacute;animation RCR</h3><p>Compressions thoraciques rythm&eacute;es &agrave; 100-120/min.</p>
-        </a>
-        <a href="prelevement.html" class="module">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l3-3"/><path d="M5 19 15 9"/><path d="M12 6l6 6"/><path d="M14.5 3.5 20.5 9.5"/></svg></div>
-          <h3>Pr&eacute;l&egrave;vement sanguin</h3><p>Garrot, d&eacute;sinfection, piq&ucirc;re &agrave; 20&deg; et fioles.</p>
-        </a>
-        <a href="bandage.html" class="module">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="16" rx="2"/><path d="M6 9h12M6 14h12"/></svg></div>
-          <h3>Bandage compressif</h3><p>Spirale avec tension r&eacute;guli&egrave;re, ni trop ni trop peu.</p>
-        </a>
-        <a href="garrot.html" class="module">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="9.5" width="10" height="5" rx="2.5"/><rect x="11.5" y="9.5" width="10" height="5" rx="2.5"/></svg></div>
-          <h3>Pose de garrot</h3><p>Point f&eacute;moral et levier pour couper l&rsquo;h&eacute;morragie.</p>
-        </a>
-        <a href="epaule.html" class="module">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20v-5a3 3 0 0 1 3-3h4l2.5-3.5 3 2-3 5.5A4 4 0 0 1 12 18H9"/></svg></div>
-          <h3>R&eacute;duction d&rsquo;&eacute;paule</h3><p>Stabilise, tire et replace en 3 &eacute;tapes.</p>
-        </a>
-        <a href="constantes.html" class="module">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
-          <h3>Prise de constantes</h3><p>Lis les constantes vitales et identifie les valeurs anormales.</p>
-        </a>
+
+      <div class="ex-cat">
+        <div class="ex-cat-head"><h3>Bases du secourisme</h3><span class="ex-cat-badge">&Agrave; faire en premier</span></div>
+        <p class="ex-cat-desc">Les r&eacute;flexes que tout secouriste Seimei doit ma&icirc;triser avant tout le reste : &eacute;valuer, stopper l&rsquo;h&eacute;morragie, stabiliser.</p>
+        <div class="modules">
+          <a href="quiz-protocoles.html" class="module">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+            <h3>Protocoles</h3><p>Arbre d&eacute;cisionnel d&rsquo;urgence, chaque &eacute;tape est chronom&eacute;tr&eacute;e.</p>
+          </a>
+          <a href="constantes.html" class="module">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+            <h3>Prise de constantes</h3><p>Lis les constantes vitales et identifie les valeurs anormales.</p>
+          </a>
+          <a href="rcr.html" class="module">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5 4.8 13a4.6 4.6 0 0 1 7.2-5.6A4.6 4.6 0 0 1 19.2 13Z"/><path d="M7.5 12h2l1.5-3 2 6 1.5-3h2"/></svg></div>
+            <h3>R&eacute;animation RCR</h3><p>Compressions thoraciques rythm&eacute;es &agrave; 100-120/min.</p>
+          </a>
+          <a href="garrot.html" class="module">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="9.5" width="10" height="5" rx="2.5"/><rect x="11.5" y="9.5" width="10" height="5" rx="2.5"/></svg></div>
+            <h3>Pose de garrot</h3><p>Point f&eacute;moral et levier pour couper l&rsquo;h&eacute;morragie.</p>
+          </a>
+          <a href="brulures.html" class="module">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c2 3 5 5 5 9a5 5 0 0 1-10 0c0-2 1-3.5 2.5-4.5C9 9.5 11 8 12 3Z"/></svg></div>
+            <h3>Br&ucirc;lures</h3><p>Refroidis la zone et r&egrave;gle la tension du pansement.</p>
+          </a>
+          <a href="fractures.html" class="module">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15l6-6"/><circle cx="6.5" cy="17.5" r="2.2"/><circle cx="17.5" cy="6.5" r="2.2"/></svg></div>
+            <h3>Fractures</h3><p>Couvre la plaie sans toucher l&rsquo;os, puis r&egrave;gle la compression.</p>
+          </a>
+          <a href="bandage.html" class="module">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="16" rx="2"/><path d="M6 9h12M6 14h12"/></svg></div>
+            <h3>Bandage compressif</h3><p>Spirale avec tension r&eacute;guli&egrave;re, ni trop ni trop peu.</p>
+          </a>
+          <a href="attelles.html" class="module">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9.5" width="18" height="5" rx="2.5" transform="rotate(-45 12 12)"/><path d="M10 10l4 4M14 10l-4 4"/></svg></div>
+            <h3>Attelles</h3><p>Pose l&rsquo;attelle et fixe le bandage dans le bon ordre.</p>
+          </a>
+        </div>
       </div>
+
+      <div class="ex-cat">
+        <div class="ex-cat-head"><h3>Soins &amp; interventions avanc&eacute;es</h3></div>
+        <p class="ex-cat-desc">Gestes techniques r&eacute;serv&eacute;s aux grades plus exp&eacute;riment&eacute;s : pr&eacute;cision, mat&eacute;riel et proc&eacute;dures plus complexes.</p>
+        <div class="modules">
+          <a href="sutures.html" class="module">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20c5-1 8-4 10-9"/><path d="M14 11l6-6"/><path d="M17 4.5 19.5 7"/></svg></div>
+            <h3>Sutures</h3><p>Pose tes points de suture avec pr&eacute;cision. 3 niveaux de difficult&eacute;.</p>
+          </a>
+          <a href="quiz-chirurgie.html" class="module">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.2"/><circle cx="6" cy="18" r="2.2"/><path d="M8 7.2 20 17M8 16.8 20 7"/></svg></div>
+            <h3>Chirurgie</h3><p>Suis l&rsquo;incision au scalpel sans d&eacute;vier pour extraire le corps &eacute;tranger.</p>
+          </a>
+          <a href="epaule.html" class="module">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20v-5a3 3 0 0 1 3-3h4l2.5-3.5 3 2-3 5.5A4 4 0 0 1 12 18H9"/></svg></div>
+            <h3>R&eacute;duction d&rsquo;&eacute;paule</h3><p>Stabilise, tire et replace en 3 &eacute;tapes.</p>
+          </a>
+          <a href="quiz-articulations.html" class="module">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15l6-6"/><circle cx="6.5" cy="17.5" r="2.2"/><circle cx="17.5" cy="6.5" r="2.2"/></svg></div>
+            <h3>Entorse</h3><p>Applique la glace puis sur&eacute;l&egrave;ve le membre &mdash; protocole RICE.</p>
+          </a>
+          <a href="prelevement.html" class="module">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l3-3"/><path d="M5 19 15 9"/><path d="M12 6l6 6"/><path d="M14.5 3.5 20.5 9.5"/></svg></div>
+            <h3>Pr&eacute;l&egrave;vement sanguin</h3><p>Garrot, d&eacute;sinfection, piq&ucirc;re &agrave; 20&deg; et fioles.</p>
+          </a>
+          <a href="quiz-recensement.html" class="module">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l3-3"/><path d="M5 19 15 9"/><path d="M12 6l6 6"/><path d="M14.5 3.5 20.5 9.5"/></svg></div>
+            <h3>Transfusion</h3><p>Glisse la poche de sang compatible jusqu&rsquo;au patient.</p>
+          </a>
+          <a href="quiz-pharma.html" class="module">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v4H9z"/><rect x="5" y="7" width="14" height="14" rx="2"/><path d="M12 11v6"/><path d="M9 14h6"/></svg></div>
+            <h3>Pharmacologie</h3><p>Choisis le rem&egrave;de et pr&eacute;pare la dose exacte &agrave; la seringue.</p>
+          </a>
+        </div>
+      </div>
+
+      <div class="ex-cat">
+        <div class="ex-cat-head"><h3>Ninjutsu m&eacute;dical</h3></div>
+        <p class="ex-cat-desc">Techniques de soin par le chakra, propres aux m&eacute;decins ninjas.</p>
+        <div class="modules">
+          <a href="quiz-ninjutsu.html" class="module">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg></div>
+            <h3>Ninjutsu M&eacute;dical</h3><p>Choisis la technique puis canalise ton chakra le temps voulu.</p>
+          </a>
+          <a href="quiz-poisons.html" class="module">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v4H9z"/><rect x="5" y="7" width="14" height="14" rx="2"/><path d="M12 11v6"/><path d="M9 14h6"/></svg></div>
+            <h3>Dokunoki no Jutsu</h3><p>Guide la bulle de chakra le long de la veine sans d&eacute;vier.</p>
+          </a>
+        </div>
+      </div>
+
+      <div class="ex-cat">
+        <div class="ex-cat-head"><h3>Savoirs fondamentaux</h3></div>
+        <p class="ex-cat-desc">Connaissances th&eacute;oriques indispensables : le corps, les plantes, l&rsquo;esprit.</p>
+        <div class="modules">
+          <a href="quiz-anatomie.html" class="module">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 0 0-5 5c0 3 2 5.5 5 9 3-3.5 5-6 5-9a5 5 0 0 0-5-5z"/></svg></div>
+            <h3>Anatomie</h3><p>Localise l&rsquo;organe demand&eacute; sur le corps en un temps limit&eacute;.</p>
+          </a>
+          <a href="quiz-botanique.html" class="module">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20h10"/><path d="M12 20v-6"/><path d="M12 14c-3 0-6-2.5-6-6 0-3.5 3-5.5 6-6 3 .5 6 2.5 6 6 0 3.5-3 6-6 6z"/></svg></div>
+            <h3>Botanique</h3><p>Glisse la bonne plante jusqu&rsquo;au patient selon le mal.</p>
+          </a>
+          <a href="quiz-psychologie.html" class="module">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2a5 5 0 0 0-5 5c0 1.5.5 2.5 1.5 3.5L4 14v3h2v3h3v-3h2l1.5-1.5"/></svg></div>
+            <h3>Psychologie</h3><p>R&eacute;agis avant que la d&eacute;tresse du patient n&rsquo;explose.</p>
+          </a>
+        </div>
+      </div>
+
+      <div class="ex-cat">
+        <div class="ex-cat-head"><h3>&Eacute;preuve finale</h3></div>
+        <p class="ex-cat-desc">Le vrai test : encha&icirc;ner les gestes de base sans temps mort, comme sur le terrain.</p>
+        <div class="modules">
+          <a href="quiz-fondamentaux.html" class="module">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 2.5 20h19L12 3.5Z"/></svg></div>
+            <h3>&Eacute;preuve des Fondamentaux</h3><p>4 stations ench&acirc;in&eacute;es : RCR, garrot, br&ucirc;lure, fracture.</p>
+          </a>
+        </div>
+      </div>
+
     </div>
 
     <!-- TECHNIQUES MEDICALES -->
