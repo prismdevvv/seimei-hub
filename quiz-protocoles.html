@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Seimei &mdash; Quiz Protocoles d'Urgence | Sunagakure</title>
+<title>Seimei &mdash; Atelier Protocoles d'Urgence | Sunagakure</title>
 <script src="vendor/supabase.js"></script>
 <script src="config.js"></script>
 <style>
@@ -20,146 +20,172 @@ body{font-family:'Cormorant Garamond',serif;color:var(--parchment);min-height:10
 body::before{content:"";position:fixed;inset:0;opacity:.05;pointer-events:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   z-index:1;}
-.wrap{position:relative;z-index:2;max-width:760px;margin:0 auto;padding:28px 16px 80px;}
+.wrap{position:relative;z-index:2;max-width:820px;margin:0 auto;padding:28px 16px 80px;}
+header{text-align:center;margin-bottom:20px;}
 .back-btn{text-align:right;margin-bottom:8px;}
 .back-btn a{font-family:'Cinzel',serif;font-weight:700;font-size:.82rem;letter-spacing:.05em;
   padding:8px 16px;border:1px solid var(--ocre);border-radius:9px;color:var(--sand-1);
-  text-decoration:none;text-transform:uppercase;transition:.2s;}
-.back-btn a:hover{background:rgba(181,113,43,.2);}
-header{text-align:center;margin-bottom:24px;}
+  text-decoration:none;text-transform:uppercase;}
 .crest{width:64px;height:64px;margin:0 auto 10px;border:3px solid var(--ocre);border-radius:50%;
   display:flex;align-items:center;justify-content:center;
   background:radial-gradient(circle,rgba(181,113,43,.25),transparent 70%);
   box-shadow:0 0 24px rgba(181,113,43,.35);}
 .crest svg{width:36px;height:36px;}
-h1{font-family:'Cinzel',serif;font-weight:900;font-size:clamp(1.5rem,4.5vw,2.3rem);
+h1{font-family:'Cinzel',serif;font-weight:900;font-size:clamp(1.6rem,5vw,2.5rem);
   letter-spacing:.06em;color:var(--sand-1);text-shadow:0 2px 0 var(--rust),0 0 28px rgba(181,113,43,.5);}
 .sub{font-size:1.1rem;color:var(--sand-deep);font-style:italic;margin-top:4px;}
 .divider{height:2px;width:58%;margin:14px auto 0;background:linear-gradient(90deg,transparent,var(--ocre),transparent);}
 .panel{background:linear-gradient(160deg,rgba(240,223,184,.07),rgba(60,41,20,.15));
-  border:1px solid rgba(181,113,43,.45);border-radius:14px;padding:22px;margin-bottom:20px;
+  border:1px solid rgba(181,113,43,.45);border-radius:14px;padding:20px;margin-bottom:18px;
   box-shadow:0 10px 30px rgba(0,0,0,.45);}
-.panel h2{font-family:'Cinzel',serif;font-weight:700;color:var(--ocre);font-size:1.18rem;
-  letter-spacing:.05em;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.panel h2{font-family:'Cinzel',serif;font-weight:700;color:var(--ocre);font-size:1.15rem;
+  letter-spacing:.05em;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
 .panel h2::before{content:"";width:7px;height:7px;background:var(--ocre);transform:rotate(45deg);}
+.lead{font-size:1.08rem;line-height:1.55;}
+.hint{font-size:.97rem;color:var(--sand-deep);font-style:italic;margin-top:7px;}
+.field{margin:12px 0;}
+label{display:block;font-size:1rem;color:var(--sand-deep);margin-bottom:5px;}
+input[type=text]{width:100%;padding:12px 15px;font-family:inherit;font-size:1.1rem;
+  background:rgba(20,12,4,.6);color:var(--sand-1);border:1px solid var(--ocre);
+  border-radius:8px;outline:none;}
+input[type=text]:focus{border-color:var(--chakra);box-shadow:0 0 12px rgba(61,220,132,.3);}
 .btn{font-family:'Cinzel',serif;font-weight:700;letter-spacing:.05em;cursor:pointer;border:none;
   border-radius:9px;padding:12px 22px;font-size:.92rem;text-transform:uppercase;
   background:linear-gradient(160deg,var(--ocre),var(--ocre-deep));color:#fff5e6;
-  box-shadow:0 5px 0 var(--rust);transition:transform .12s;}
+  box-shadow:0 5px 0 var(--rust),0 8px 16px rgba(0,0,0,.4);transition:transform .12s,box-shadow .12s;
+  text-decoration:none;display:inline-block;}
 .btn:hover{transform:translateY(-2px);}
 .btn:active{transform:translateY(3px);box-shadow:0 2px 0 var(--rust);}
-.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important;}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none !important;box-shadow:0 5px 0 var(--rust) !important;}
 .btn.ghost{background:transparent;border:1px solid var(--ocre);box-shadow:none;color:var(--sand-1);font-size:.82rem;padding:7px 14px;}
-.controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:16px;}
-.progress-bar{display:flex;gap:6px;justify-content:center;margin-bottom:18px;flex-wrap:wrap;}
-.pdot{width:22px;height:6px;border-radius:3px;background:rgba(181,113,43,.25);border:1px solid rgba(181,113,43,.35);transition:.3s;}
-.pdot.ok{background:var(--chakra);border-color:var(--chakra);}
-.pdot.bad{background:var(--blood-light);border-color:var(--blood-light);}
-.pdot.cur{background:var(--gold);border-color:var(--gold);box-shadow:0 0 8px rgba(255,216,107,.5);}
-.score-bar{font-family:'Cinzel',serif;font-weight:700;font-size:1rem;color:var(--sand-deep);
-  text-align:center;margin-bottom:10px;letter-spacing:.04em;}
-.score-bar .val{color:var(--sand-1);}
-.case-box{background:rgba(20,12,4,.55);border:1px solid rgba(181,113,43,.35);border-radius:12px;
-  padding:18px 20px;margin-bottom:18px;}
-.case-label{font-family:'Cinzel',serif;font-weight:700;font-size:.78rem;letter-spacing:.08em;
-  text-transform:uppercase;color:var(--ocre);margin-bottom:6px;}
-.case-text{font-size:1.1rem;line-height:1.55;color:var(--parchment);}
-.choice{display:block;width:100%;text-align:left;padding:13px 18px;margin-bottom:9px;
-  font-family:inherit;font-size:1.05rem;color:var(--parchment);cursor:pointer;
-  background:rgba(20,12,4,.45);border:1.5px solid rgba(181,113,43,.35);
-  border-radius:10px;transition:.18s;line-height:1.4;}
-.choice:hover{background:rgba(181,113,43,.12);border-color:var(--ocre);}
-.choice.sel{background:rgba(255,216,107,.12);border-color:var(--gold);color:var(--gold);}
-.choice.correct{background:rgba(61,220,132,.12);border-color:var(--chakra);color:var(--chakra-glow);}
-.choice.wrong{background:rgba(196,69,58,.12);border-color:var(--blood-light);color:#ffcaa0;}
-.choice.dis{cursor:default;opacity:.55;}
-.choice.dis.correct,.choice.dis.wrong{opacity:1;}
-.explain{background:rgba(20,12,4,.5);border:1px dashed var(--ocre);border-radius:10px;
-  padding:14px 16px;margin-top:14px;display:none;line-height:1.5;font-size:.98rem;}
-.explain.vis{display:block;}
-.explain strong{color:var(--sand-1);}
-#endScreen{display:none;}
-.final-score{font-family:'Cinzel',serif;font-weight:900;font-size:3rem;text-align:center;margin:10px 0;}
-.final-score.excellent{color:var(--chakra-glow);text-shadow:0 0 24px rgba(61,220,132,.6);}
-.final-score.good{color:var(--gold);text-shadow:0 0 18px rgba(255,216,107,.4);}
-.final-score.average{color:var(--sand-1);}
-.final-score.poor{color:var(--blood-light);}
-.final-verdict{text-align:center;font-size:1.12rem;margin-bottom:18px;line-height:1.5;}
-.recap-item{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;
-  border-bottom:1px solid rgba(181,113,43,.2);font-size:1rem;}
-.recap-item:last-child{border:none;}
-.recap-item .rname{color:var(--sand-deep);flex:1;}
-.recap-item .rtag{font-family:'Cinzel',serif;font-weight:700;font-size:.85rem;
-  padding:3px 10px;border-radius:5px;}
-.rok{background:rgba(61,220,132,.15);color:var(--chakra-glow);}
-.rfail{background:rgba(196,69,58,.15);color:#ffcaa0;}
-footer{text-align:center;margin-top:30px;color:var(--sand-deep);font-style:italic;}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.prog-wrap{flex:1;height:8px;background:rgba(20,12,4,.5);border-radius:6px;overflow:hidden;
+  border:1px solid rgba(181,113,43,.3);margin:0 14px;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--ocre),var(--gold));width:0;transition:width .4s;}
+.case-lbl{font-family:'Cinzel',serif;font-size:.88rem;color:var(--sand-deep);}
+.scen-tag{display:inline-block;font-family:'Cinzel',serif;font-size:.8rem;letter-spacing:.08em;
+  padding:3px 11px;border-radius:6px;background:rgba(181,113,43,.25);color:var(--gold);
+  margin-bottom:8px;text-transform:uppercase;}
+.desc{font-size:1.05rem;line-height:1.5;margin-bottom:14px;color:var(--parchment);}
+.scene{display:flex;justify-content:center;margin:14px 0;}
+.scene-area{width:120px;height:120px;border-radius:50%;
+  border:3px solid var(--rust);background:radial-gradient(circle,rgba(181,113,43,.18),rgba(20,12,4,.5));
+  box-shadow:inset 0 0 25px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;
+  font-size:3.2rem;}
+.instruction{font-size:1.05rem;color:var(--sand-1);text-align:center;margin:12px 0 6px;font-style:italic;}
+.tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:14px;}
+.tool{position:relative;background:rgba(20,12,4,.55);border:1.5px solid rgba(181,113,43,.4);
+  border-radius:11px;padding:14px 10px;cursor:pointer;transition:.2s;text-align:center;
+  user-select:none;}
+.tool:hover:not(.locked){background:rgba(181,113,43,.15);border-color:var(--ocre);transform:translateY(-2px);}
+.tool .ico{font-size:2rem;display:block;margin-bottom:6px;line-height:1;}
+.tool .name{font-family:'Cinzel',serif;font-size:.82rem;font-weight:700;color:var(--sand-1);letter-spacing:.03em;}
+.tool .desc-small{font-size:.85rem;color:var(--sand-deep);margin-top:4px;font-style:italic;line-height:1.25;}
+.tool.selected{background:rgba(255,216,107,.18);border-color:var(--gold);box-shadow:0 0 0 1px var(--gold);}
+.tool.selected .name{color:var(--gold);}
+.tool.correct{background:rgba(61,220,132,.18);border-color:var(--chakra-glow);}
+.tool.correct::after{content:"✓";position:absolute;top:6px;right:8px;color:var(--chakra-glow);font-weight:700;font-size:1.2rem;}
+.tool.wrong{background:rgba(196,69,58,.18);border-color:var(--blood-light);}
+.tool.wrong::after{content:"✗";position:absolute;top:6px;right:8px;color:var(--blood-light);font-weight:700;font-size:1.2rem;}
+.tool.missed{opacity:.6;border-style:dashed;}
+.tool.missed::after{content:"!";position:absolute;top:6px;right:8px;color:var(--gold);font-weight:700;font-size:1.2rem;}
+.tool.locked{cursor:default;}
+.feedback{padding:11px 14px;border-radius:9px;font-size:1.04rem;line-height:1.45;
+  display:none;margin-top:12px;}
+.feedback.ok{display:block;background:rgba(61,220,132,.1);border:1px solid rgba(61,220,132,.4);color:var(--chakra);}
+.feedback.no{display:block;background:rgba(196,69,58,.12);border:1px solid rgba(196,69,58,.45);color:#ffcaa0;}
+.controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px;}
+#result{display:none;text-align:center;}
+.grade{font-family:'Cinzel',serif;font-weight:900;font-size:3rem;margin:6px 0;}
+.grade.s{color:var(--chakra-glow);text-shadow:0 0 24px rgba(61,220,132,.6);}
+.grade.a{color:var(--gold);}
+.grade.b{color:var(--sand-1);}
+.grade.c{color:var(--sand-deep);}
+.grade.f{color:var(--blood-light);}
+.verdict{font-size:1.12rem;margin-bottom:14px;line-height:1.5;}
+.rrow{display:flex;justify-content:space-between;padding:7px 0;
+  border-bottom:1px solid rgba(181,113,43,.2);font-size:1.05rem;}
+.rrow:last-child{border:none;}
+.rrow .k{color:var(--sand-deep);}
+.rrow .v{color:var(--sand-1);font-weight:600;}
+.cloud{margin-top:10px;font-size:.97rem;border-radius:8px;padding:10px 12px;
+  color:var(--sand-deep);border:1px solid rgba(181,113,43,.4);background:rgba(20,12,4,.4);}
+.cloud.ok{color:var(--chakra);border-color:rgba(61,220,132,.45);background:rgba(61,220,132,.08);}
+.cloud.warn{color:#ffcaa0;border-color:rgba(196,69,58,.5);background:rgba(196,69,58,.1);}
+footer{text-align:center;margin-top:26px;color:var(--sand-deep);font-style:italic;}
 footer .seal{color:var(--ocre);font-family:'Cinzel',serif;}
-@media(max-width:480px){.panel{padding:16px 14px;}.case-text{font-size:1rem;}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="back-btn"><a href="protocoles.html">&larr; Retour au cours</a></div>
   <header>
-    <div class="crest"><svg viewBox="0 0 100 100" fill="none">
-      <circle cx="50" cy="50" r="30" stroke="#b5712b" stroke-width="4"/>
-      <path d="M50 22 L58 44 L50 50 L42 44 Z" fill="#b5712b"/>
-      <path d="M50 78 L42 56 L50 50 L58 56 Z" fill="#b5712b"/>
-      <circle cx="50" cy="50" r="6" fill="#8a4f1a"/>
-    </svg></div>
-    <h1>Quiz Protocoles d&rsquo;Urgence</h1>
-    <div class="sub">Section M&eacute;dicale Seimei &middot; Sunagakure</div>
+    <div class="crest">
+      <svg viewBox="0 0 100 100" fill="none">
+        <circle cx="50" cy="50" r="30" stroke="#b5712b" stroke-width="4"/>
+        <path d="M50 22 L58 44 L50 50 L42 44 Z" fill="#b5712b"/>
+        <path d="M50 78 L42 56 L50 50 L58 56 Z" fill="#b5712b"/>
+        <circle cx="50" cy="50" r="6" fill="#8a4f1a"/>
+      </svg>
+    </div>
+    <h1>Atelier Protocoles d&rsquo;Urgence</h1>
+    <div class="sub">Section M&eacute;dicale &mdash; Seimei &middot; Sunagakure</div>
     <div class="divider"></div>
   </header>
 
   <div id="intro">
     <div class="panel">
       <h2>Briefing</h2>
-      <p style="font-size:1.08rem;line-height:1.55;">L&rsquo;arbre d&eacute;cisionnel d&rsquo;urgence, &eacute;tape par &eacute;tape. Un bon r&eacute;flexe au bon moment sauve une vie.</p>
-      <p style="margin-top:8px;font-size:.97rem;color:var(--sand-deep);font-style:italic;">10 questions tir&eacute;es al&eacute;atoirement.</p>
+      <p class="lead">Tu vas suivre l&rsquo;arbre d&eacute;cisionnel d&rsquo;urgence sur plusieurs situations. Pour chaque cas, choisis les <strong>bonnes actions</strong> &agrave; suivre selon le protocole.</p>
+      <p class="hint" style="margin-top:8px;">&#9888; Attention : certains gestes sont des <strong>pi&egrave;ges</strong>. Les choisir aggrave la situation et te co&ucirc;tera des points.</p>
     </div>
     <div class="panel">
       <h2>Identification</h2>
-      <div style="margin:10px 0;">
-        <label style="display:block;font-size:1.05rem;color:var(--sand-deep);margin-bottom:6px;">Nom de shinobi</label>
-        <input type="text" id="nameInput" placeholder="Ex : Zipo Asakura" maxlength="28" autocomplete="off"
-          style="width:100%;padding:13px 16px;font-family:inherit;font-size:1.15rem;background:rgba(20,12,4,.6);color:var(--sand-1);border:1px solid var(--ocre);border-radius:8px;outline:none;">
+      <div class="field">
+        <label for="nameInput">Nom de shinobi</label>
+        <input type="text" id="nameInput" placeholder="Ex : Zipo Asakura" maxlength="28" autocomplete="off">
       </div>
-      <div class="controls"><button class="btn" id="startBtn">Commencer le quiz</button></div>
+      <div style="margin-top:16px;text-align:center;">
+        <button class="btn" id="startBtn">Commencer</button>
+      </div>
     </div>
   </div>
 
   <div id="game" style="display:none;">
-    <div class="progress-bar" id="pbar"></div>
-    <div class="score-bar">Score : <span class="val" id="scoreLbl">0 / 0</span></div>
     <div class="panel">
-      <h2 id="caseTitle">Question 1 / 10</h2>
-      <div class="case-box">
-        <div class="case-label">Question</div>
-        <div class="case-text" id="caseText"></div>
+      <div class="topbar">
+        <span class="case-lbl" id="caseLbl">Cas 1/4</span>
+        <div class="prog-wrap"><div class="prog-fill" id="progFill"></div></div>
+        <span class="case-lbl" id="scoreLbl">0/0</span>
       </div>
-      <div id="choicesBox"></div>
-      <div class="controls" id="valCtrl"><button class="btn" id="valBtn" disabled>Valider</button></div>
-      <div class="explain" id="explBox"></div>
-      <div class="controls" id="nextCtrl" style="display:none;"><button class="btn" id="nextBtn">Question suivante</button></div>
+      <div class="scen-tag" id="scenTag"></div>
+      <p class="desc" id="descTxt"></p>
+      <div class="scene"><div class="scene-area" id="sceneArea"></div></div>
+      <div class="instruction">S&eacute;lectionne les gestes appropri&eacute;s, puis valide.</div>
+      <div class="tool-grid" id="toolGrid"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="controls">
+        <button class="btn" id="nextBtn" disabled>Valider</button>
+      </div>
     </div>
   </div>
 
-  <div id="endScreen">
-    <div class="panel" style="text-align:center;">
-      <h2 style="justify-content:center;">&Eacute;valuation termin&eacute;e</h2>
-      <div class="final-score" id="finalScore"></div>
-      <div class="final-verdict" id="finalVerdict"></div>
-    </div>
+  <div id="result">
     <div class="panel">
-      <h2>R&eacute;capitulatif</h2>
-      <div id="recapList"></div>
+      <h2>Rapport d&rsquo;&eacute;valuation</h2>
+      <div class="grade" id="gradeLetter">&mdash;</div>
+      <div class="verdict" id="verdict"></div>
+      <div id="reportBox" style="background:rgba(20,12,4,.55);border:1px dashed var(--ocre);border-radius:12px;padding:16px;margin:14px 0;text-align:left;"></div>
+      <div class="cloud" id="cloudStatus">&#8987; Envoi...</div>
+      <div style="text-align:center;font-style:italic;color:var(--sand-deep);margin-top:12px;">Cachet &mdash; Seimei, Sunagakure</div>
+      <div class="controls" style="margin-top:14px;">
+        <button class="btn ghost" id="retryBtn">Recommencer</button>
+        <button class="btn" id="newPlayerBtn">Nouvel apprenti</button>
+      </div>
     </div>
-    <div class="controls" style="margin-top:6px;"><button class="btn ghost" id="retryBtn">Recommencer</button></div>
   </div>
 
-  <footer>Outil p&eacute;dagogique officiel &middot; <span class="seal">Seimei</span> &middot; Sunagakure</footer>
+  <footer>Outil p&eacute;dagogique &middot; <span class="seal">Seimei</span> &middot; Sunagakure</footer>
 </div>
 
 <script>
@@ -167,163 +193,205 @@ footer .seal{color:var(--ocre);font-family:'Cinzel',serif;}
 var el=function(id){return document.getElementById(id);};
 function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
 
-var POOL=[
-  {situation:"Quelle est la toute première étape de l'arbre décisionnel d'urgence ?",
-   answer:"Vérifier que la zone est sûre",
-   opts:["Vérifier que la zone est sûre","Commencer la RCR","Poser un garrot","Appeler un grade supérieur"],
-   explain:"Avant tout geste, il faut sécuriser la zone — un soignant blessé ne peut plus aider personne."},
-
-  {situation:"À l'étape 3, la victime ne respire pas. Que fais-tu ?",
-   answer:"Réanimation immédiate : 30 compressions / 2 insufflations",
-   opts:["Réanimation immédiate : 30 compressions / 2 insufflations","Position latérale de sécurité","J'attends 5 minutes pour confirmer","Je cherche d'abord une hémorragie"],
-   explain:"L'absence de respiration signale un arrêt cardiaque : la réanimation doit commencer sans délai."},
-
-  {situation:"La victime respire mais reste inconsciente. Quel geste appliquer ?",
-   answer:"Position Latérale de Sécurité (PLS)",
-   opts:["Position Latérale de Sécurité (PLS)","Réanimation cardio-respiratoire","Garrot préventif","La laisser sur le dos"],
-   explain:"La PLS protège les voies respiratoires d'une victime inconsciente qui respire encore."},
-
-  {situation:"Quelle est l'étape 4 de l'arbre décisionnel d'urgence ?",
-   answer:"Hémorragie",
-   opts:["Hémorragie","Fractures","Brûlures","Empoisonnement"],
-   explain:"Après sécurité, conscience et respiration, l'étape 4 recherche une hémorragie à traiter."},
-
-  {situation:"Dans le protocole empoisonnement, à partir de quel grade utilise-t-on le Dokunoki ?",
-   answer:"Adepte",
-   opts:["Adepte","Aspirant","Chunin","Expert uniquement"],
-   explain:"Le Dokunoki no Jutsu est une technique Adepte — en dessous, on stabilise et on transmet."},
-
-  {situation:"Sur une fracture ouverte, où faut-il comprimer pour limiter le saignement ?",
-   answer:"Autour de la fracture, jamais dessus",
-   opts:["Autour de la fracture, jamais dessus","Directement sur l'os exposé","Peu importe l'endroit","Uniquement au-dessus"],
-   explain:"Comprimer directement sur l'os exposé aggrave la blessure — on comprime toujours autour."},
-
-  {situation:"Que représente l'étape 5, dernière étape de l'arbre décisionnel ?",
-   answer:"Le bilan secondaire",
-   opts:["Le bilan secondaire","Le transport du patient","La pose d'un garrot","L'anesthésie"],
-   explain:"Le bilan secondaire recherche fractures, brûlures, plaies, et prend les constantes du patient."},
-
-  {situation:"Pendant combien de temps faut-il écouter/sentir/regarder pour vérifier la respiration ?",
-   answer:"10 secondes",
-   opts:["10 secondes","2 secondes","30 secondes","1 minute"],
-   explain:"10 secondes suffisent pour confirmer une respiration absente ou présente sans perdre de temps précieux."},
-
-  {situation:"Protocole brûlure : combien de temps minimum faut-il refroidir la zone à l'eau fraîche ?",
-   answer:"20 minutes",
-   opts:["20 minutes","2 minutes","1 heure","5 minutes"],
-   explain:"20 minutes de refroidissement limitent la progression de la brûlure en profondeur."},
-
-  {situation:"Un patient inconscient qui respire ne doit jamais être...",
-   answer:"laissé seul",
-   opts:["laissé seul","mis en PLS","surveillé en continu","couvert d'une couverture"],
-   explain:"Un patient inconscient peut se dégrader à tout moment — il ne doit jamais être laissé sans surveillance."}
+var CASES=[
+  {
+    tag:"Victime inconsciente qui respire",
+    icon:"😴",
+    desc:"Une victime inconsciente respire normalement. Aucune hémorragie visible.",
+    good:["pls","surveiller_respiration","rester_present"],
+    bad:["rcr_immediate","laisser_sur_dos","partir_sans_surveiller"]
+  },
+  {
+    tag:"Victime ne respire pas",
+    icon:"🫁",
+    desc:"Une victime est inconsciente et ne respire pas du tout après vérification de 10 secondes.",
+    good:["rcr_30_2","alerter_secours","rythme_100_120"],
+    bad:["attendre_reveil","pls_seule","bouche_a_bouche_seul"]
+  },
+  {
+    tag:"Hémorragie repérée pendant le bilan",
+    icon:"🩸",
+    desc:"Pendant l'étape 4 de l'arbre décisionnel, tu repères une hémorragie active sur le bras de la victime.",
+    good:["compression_directe","garrot_si_insuffisant"],
+    bad:["ignorer_hemorragie","garrot_direct_sans_compression"]
+  },
+  {
+    tag:"Empoisonnement suspecté",
+    icon:"☠️",
+    desc:"La victime présente des symptômes qui ne correspondent pas à la blessure visible : possible empoisonnement.",
+    good:["identifier_poison","stabiliser_transmettre"],
+    bad:["traiter_a_l_aveugle","ignorer_symptomes"]
+  }
 ];
 
-var NB=10,playerName='',cases=[],ci=0,score=0,results=[],selected=null,validated=false;
+var TOOLS={
+  pls:{ico:"🛌",name:"Position Latérale de Sécurité",desc:"Protège les voies respiratoires"},
+  surveiller_respiration:{ico:"👁️",name:"Surveiller la respiration",desc:"En continu"},
+  rester_present:{ico:"🤝",name:"Rester auprès de la victime",desc:"Ne jamais la laisser seule"},
+  rcr_immediate:{ico:"🙌",name:"RCR immédiate",desc:"PIÈGE — la victime respire déjà"},
+  laisser_sur_dos:{ico:"🛏️",name:"Laisser sur le dos",desc:"PIÈGE — risque d'étouffement"},
+  partir_sans_surveiller:{ico:"🚶",name:"Partir sans surveiller",desc:"PIÈGE — état peut se dégrader"},
+  rcr_30_2:{ico:"💓",name:"RCR : 30 compressions / 2 insufflations",desc:"Cycle standard"},
+  alerter_secours:{ico:"🚨",name:"Alerter les secours",desc:"Sans délai"},
+  rythme_100_120:{ico:"⏱️",name:"Rythme 100-120/min",desc:"Cadence correcte"},
+  attendre_reveil:{ico:"⏳",name:"Attendre le réveil",desc:"PIÈGE — perte de temps fatale"},
+  pls_seule:{ico:"🛌",name:"PLS seule, sans RCR",desc:"PIÈGE — insuffisant si arrêt respiratoire"},
+  bouche_a_bouche_seul:{ico:"👄",name:"Bouche-à-bouche seul",desc:"PIÈGE — sans compressions"},
+  compression_directe:{ico:"✋",name:"Compression directe",desc:"Forte et continue"},
+  garrot_si_insuffisant:{ico:"⛓️",name:"Garrot si insuffisant",desc:"Sur membre, en dernier recours"},
+  ignorer_hemorragie:{ico:"🙈",name:"Ignorer l'hémorragie",desc:"PIÈGE — aggrave le choc"},
+  garrot_direct_sans_compression:{ico:"⚡",name:"Garrot direct sans compression",desc:"PIÈGE — geste disproportionné"},
+  identifier_poison:{ico:"🔍",name:"Identifier le poison",desc:"Type, quantité, voie"},
+  stabiliser_transmettre:{ico:"📋",name:"Stabiliser et transmettre",desc:"Vers un grade supérieur"},
+  traiter_a_l_aveugle:{ico:"❓",name:"Traiter à l'aveugle",desc:"PIÈGE — peut aggraver l'état"},
+  ignorer_symptomes:{ico:"🙈",name:"Ignorer les symptômes",desc:"PIÈGE — retarde le traitement"}
+};
 
-el('startBtn').addEventListener('click',start);
-el('valBtn').addEventListener('click',validate);
-el('nextBtn').addEventListener('click',next);
-el('retryBtn').addEventListener('click',function(){location.reload();});
+var SEQ=[];
+var NB=4;
+var ST={name:"",idx:0,selected:[],answered:false,correctCount:0,results:[]};
 
-function start(){
+function startGame(){
   var nm=el('nameInput').value.trim();
-  if(!nm){el('nameInput').style.borderColor='var(--blood-light)';setTimeout(function(){el('nameInput').style.borderColor='';},900);return;}
-  playerName=nm;
-  cases=shuffle(POOL).slice(0,NB);
-  ci=0;score=0;results=[];
-  el('intro').style.display='none';el('game').style.display='';el('endScreen').style.display='none';
-  buildBar();loadCase();
+  if(!nm){el('nameInput').style.borderColor='var(--blood-light)';
+    setTimeout(function(){el('nameInput').style.borderColor='';},900);return;}
+  ST.name=nm; ST.idx=0; ST.correctCount=0; ST.results=[];
+  SEQ=shuffle(CASES);
+  el('intro').style.display='none'; el('result').style.display='none';
+  el('game').style.display='block';
+  loadCase();
+  window.scrollTo({top:0,behavior:'smooth'});
 }
-
-function buildBar(){var b=el('pbar');b.innerHTML='';for(var i=0;i<NB;i++){var d=document.createElement('div');d.className='pdot'+(i===0?' cur':'');d.id='pd'+i;b.appendChild(d);}}
-function updateBar(){for(var i=0;i<NB;i++){var d=el('pd'+i);d.className='pdot';if(i<results.length)d.className+=(results[i]?' ok':' bad');else if(i===ci)d.className+=' cur';}}
 
 function loadCase(){
-  var c=cases[ci];validated=false;selected=null;
-  el('caseTitle').textContent='Question '+(ci+1)+' / '+NB;
-  el('caseText').textContent=c.situation;
-  var box=el('choicesBox');box.innerHTML='';
-  var opts=shuffle(c.opts);
-  opts.forEach(function(o){
-    var btn=document.createElement('button');btn.className='choice';btn.textContent=o;
-    btn.setAttribute('data-val',o);
-    btn.addEventListener('click',function(){if(validated)return;selectChoice(o);});
-    box.appendChild(btn);
+  var c=SEQ[ST.idx];
+  ST.selected=[]; ST.answered=false;
+  el('feedback').className='feedback'; el('feedback').textContent='';
+  el('nextBtn').disabled=true;
+  el('nextBtn').textContent='Valider';
+  el('progFill').style.width=Math.round(ST.idx/NB*100)+'%';
+  el('caseLbl').textContent='Cas '+(ST.idx+1)+'/'+NB;
+  el('scoreLbl').textContent=ST.correctCount+'/'+ST.idx;
+  el('scenTag').textContent=c.tag;
+  el('descTxt').textContent=c.desc;
+  el('sceneArea').textContent=c.icon;
+  var allKeys=c.good.concat(c.bad);
+  var displayed=shuffle(allKeys);
+  var grid=el('toolGrid'); grid.innerHTML='';
+  displayed.forEach(function(k){
+    var t=TOOLS[k];
+    if(!t)return;
+    var div=document.createElement('div');
+    div.className='tool'; div.dataset.k=k;
+    div.innerHTML='<span class="ico">'+t.ico+'</span>'+
+      '<div class="name">'+t.name+'</div>'+
+      '<div class="desc-small">'+t.desc.replace('PIÈGE — ','')+'</div>';
+    div.addEventListener('click',function(){toggleTool(k,div);});
+    grid.appendChild(div);
   });
-  el('valBtn').disabled=true;
-  el('valCtrl').style.display='';el('nextCtrl').style.display='none';
-  el('explBox').className='explain';el('explBox').innerHTML='';
-  el('scoreLbl').textContent=score+' / '+ci;
-  updateBar();
 }
 
-function selectChoice(v){
-  selected=v;
-  var btns=el('choicesBox').children;
-  for(var i=0;i<btns.length;i++)btns[i].className='choice'+(btns[i].getAttribute('data-val')===v?' sel':'');
-  el('valBtn').disabled=false;
+function toggleTool(k,div){
+  if(ST.answered)return;
+  var i=ST.selected.indexOf(k);
+  if(i>=0){ST.selected.splice(i,1);div.classList.remove('selected');}
+  else{ST.selected.push(k);div.classList.add('selected');}
+  el('nextBtn').disabled=ST.selected.length===0;
 }
 
 function validate(){
-  if(validated)return;validated=true;
-  var c=cases[ci];
-  var ok=(selected===c.answer);
-  if(ok)score++;
-  results.push(ok);
-  var btns=el('choicesBox').children;
-  for(var i=0;i<btns.length;i++){
-    var b=btns[i],v=b.getAttribute('data-val');
-    b.className='choice dis';
-    if(v===c.answer)b.className+=' correct';
-    else if(v===selected&&!ok)b.className+=' wrong';
+  if(ST.answered){nextCase();return;}
+  ST.answered=true;
+  var c=SEQ[ST.idx];
+  var grid=el('toolGrid');
+  var goodSelected=0, badSelected=0, missed=0;
+  grid.querySelectorAll('.tool').forEach(function(div){
+    var k=div.dataset.k;
+    var isGood=c.good.indexOf(k)>=0;
+    var isBad=c.bad.indexOf(k)>=0;
+    var isSel=ST.selected.indexOf(k)>=0;
+    div.classList.add('locked');
+    if(isSel && isGood){div.classList.add('correct');goodSelected++;}
+    else if(isSel && isBad){div.classList.add('wrong');badSelected++;}
+    else if(!isSel && isGood){div.classList.add('missed');missed++;}
+  });
+  var perfect=(goodSelected===c.good.length && badSelected===0 && missed===0);
+  if(perfect){
+    ST.correctCount++;
+    el('feedback').className='feedback ok';
+    el('feedback').textContent='✓ Parfait ! Tu as choisi les bons gestes sans aucun piège.';
+  } else {
+    var msg='✗ ';
+    if(badSelected>0) msg+=badSelected+' erreur(s) — gestes à proscrire. ';
+    if(missed>0) msg+=missed+' geste(s) essentiel(s) oublié(s). ';
+    el('feedback').className='feedback no';
+    el('feedback').textContent=msg.trim();
   }
-  var ex=el('explBox');
-  ex.innerHTML=(ok?'<p style="color:var(--chakra-glow);font-weight:600;margin-bottom:8px;">✔ Correct !</p>':'<p style="color:#ffcaa0;font-weight:600;margin-bottom:8px;">✘ Réponse incorrecte.</p>')
-    +'<p><strong>Réponse :</strong> '+c.answer+'</p><p style="margin-top:6px;">'+c.explain+'</p>';
-  ex.className='explain vis';
-  el('valCtrl').style.display='none';
-  el('nextBtn').textContent=(ci===NB-1)?'Voir les résultats':'Question suivante';
-  el('nextCtrl').style.display='';
-  el('scoreLbl').textContent=score+' / '+(ci+1);
-  updateBar();
+  ST.results.push({tag:c.tag,good:goodSelected,total_good:c.good.length,bad:badSelected,missed:missed,perfect:perfect});
+  el('nextBtn').textContent=ST.idx<NB-1?'Cas suivant':'Voir le résultat';
+  el('nextBtn').disabled=false;
 }
 
-function next(){
-  ci++;
-  if(ci>=NB){showEnd();return;}
-  loadCase();
+function nextCase(){
+  if(ST.idx<NB-1){ST.idx++;loadCase();}
+  else{finish();}
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
-function showEnd(){
-  el('game').style.display='none';el('endScreen').style.display='block';
-  var pct=Math.round((score/NB)*100);
-  var fs=el('finalScore');fs.textContent=score+' / '+NB;
-  if(pct>=90){fs.className='final-score excellent';el('finalVerdict').textContent='Excellent ! Les fondamentaux sont acquis.';}
-  else if(pct>=70){fs.className='final-score good';el('finalVerdict').textContent='Bon niveau. Quelques gestes à revoir.';}
-  else if(pct>=50){fs.className='final-score average';el('finalVerdict').textContent='Moyen. Relis la fiche des 4 Fondamentaux avant ta prochaine garde.';}
-  else{fs.className='final-score poor';el('finalVerdict').textContent='Insuffisant. Reprends le cours et recommence.';}
-
-  var list=el('recapList');list.innerHTML='';
-  for(var i=0;i<results.length;i++){
-    var d=document.createElement('div');d.className='recap-item';
-    var n=document.createElement('span');n.className='rname';n.textContent='Q'+(i+1)+' — '+cases[i].answer;
-    var t=document.createElement('span');t.className='rtag '+(results[i]?'rok':'rfail');t.textContent=results[i]?'Correct':'Incorrect';
-    d.appendChild(n);d.appendChild(t);list.appendChild(d);
-  }
-  saveScore(pct);
+function finish(){
+  el('progFill').style.width='100%';
+  var score=Math.round(ST.correctCount/NB*100);
+  var g=gradeFor(score);
+  el('gradeLetter').textContent=g.l; el('gradeLetter').className='grade '+g.cls;
+  el('verdict').textContent=g.txt;
+  var box=el('reportBox'); box.innerHTML='';
+  addRow(box,'Apprenti',ST.name);
+  ST.results.forEach(function(r,i){
+    addRow(box,'Cas '+(i+1)+' — '+r.tag,
+      r.perfect?'✓ Parfait':(r.good+'/'+r.total_good+' bons · '+r.bad+' pièges · '+r.missed+' oublis'));
+  });
+  addRow(box,'Cas parfaits',ST.correctCount+' / '+NB);
+  addRow(box,'SCORE',score+' / 100');
+  save({name:ST.name,correct:ST.correctCount,total:NB,score:score,grade:g.l});
+  el('game').style.display='none'; el('result').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
-function saveScore(pct){
-  var grade;
-  if(pct>=90)grade='S';else if(pct>=75)grade='A';else if(pct>=60)grade='B';
-  else if(pct>=40)grade='C';else grade='D';
-  if(typeof SUPABASE_URL==='undefined')return;
+function addRow(p,k,v){var d=document.createElement('div');d.className='rrow';
+  d.innerHTML='<span class="k">'+k+'</span><span class="v">'+v+'</span>';p.appendChild(d);}
+
+function gradeFor(s){
+  if(s>=95)return {l:"S",cls:"s",txt:"Maîtrise parfaite des 4 fondamentaux. La Seimei te félicite."};
+  if(s>=80)return {l:"A",cls:"a",txt:"Très bonne maîtrise. Tu es prêt pour le terrain."};
+  if(s>=60)return {l:"B",cls:"b",txt:"Bonnes bases, quelques détails à revoir."};
+  if(s>=40)return {l:"C",cls:"c",txt:"Niveau passable. Révise les conduites à tenir."};
+  return {l:"D",cls:"f",txt:"Connaissances insuffisantes. Reprends le cours."};
+}
+
+function save(row){
+  var note=el('cloudStatus');
+  var URL=(typeof SUPABASE_URL!=='undefined')?SUPABASE_URL:null;
+  var KEY=(typeof SUPABASE_KEY!=='undefined')?SUPABASE_KEY:null;
+  if(!URL||!KEY){note.textContent="⚠ Mode hors-ligne.";note.className="cloud warn";return;}
+  note.textContent="⏳ Envoi..."; note.className="cloud";
   try{
-    var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-    sb.from('course_quiz_scores').insert([{name:playerName,course:'protocoles',score:pct,grade:grade,correct:score,total:NB}]).then(function(){},function(){});
-  }catch(e){}
+    var sb=window.supabase.createClient(URL,KEY);
+    sb.from('protocoles_scores').insert([row]).then(function(res){
+      if(res.error){note.textContent="⚠ Erreur : "+res.error.message;note.className="cloud warn";}
+      else{note.textContent="✓ Score transmis au formateur.";note.className="cloud ok";}
+    },function(){note.textContent="⚠ Erreur réseau.";note.className="cloud warn";});
+  }catch(e){note.textContent="⚠ Erreur.";note.className="cloud warn";}
 }
+
+el('startBtn').addEventListener('click',startGame);
+el('nameInput').addEventListener('keydown',function(e){if(e.key==='Enter')startGame();});
+el('nextBtn').addEventListener('click',validate);
+el('retryBtn').addEventListener('click',startGame);
+el('newPlayerBtn').addEventListener('click',function(){
+  el('nameInput').value='';
+  el('result').style.display='none';el('game').style.display='none';el('intro').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+});
 })();
 </script>
 </body>
