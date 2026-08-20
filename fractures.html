@@ -75,22 +75,29 @@ input[type=text]:focus{border-color:var(--chakra);box-shadow:0 0 12px rgba(61,22
 .burn-area svg{width:100%;height:100%;}
 /* Tool grid */
 .instruction{font-size:1.05rem;color:var(--sand-1);text-align:center;margin:12px 0 6px;font-style:italic;}
-.tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:14px;}
-.tool{position:relative;background:rgba(20,12,4,.55);border:1.5px solid rgba(181,113,43,.4);
-  border-radius:11px;padding:14px 10px;cursor:pointer;transition:.2s;text-align:center;
-  user-select:none;}
-.tool:hover:not(.locked){background:rgba(181,113,43,.15);border-color:var(--ocre);transform:translateY(-2px);}
-.tool .ico{font-size:2rem;display:block;margin-bottom:6px;line-height:1;}
-.tool .name{font-family:'Cinzel',serif;font-size:.82rem;font-weight:700;color:var(--sand-1);letter-spacing:.03em;}
-.tool .desc-small{font-size:.85rem;color:var(--sand-deep);margin-top:4px;font-style:italic;line-height:1.25;}
-.tool.selected{background:rgba(255,216,107,.18);border-color:var(--gold);box-shadow:0 0 0 1px var(--gold);}
+.tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(152px,1fr));gap:12px;margin-top:14px;}
+.tool{position:relative;background:linear-gradient(160deg,rgba(240,223,184,.06),rgba(20,12,4,.55));
+  border:1.5px solid rgba(181,113,43,.4);border-radius:14px;padding:18px 12px 14px;cursor:pointer;
+  transition:.2s;text-align:center;user-select:none;box-shadow:0 4px 14px rgba(0,0,0,.3);}
+.tool:hover:not(.locked){background:linear-gradient(160deg,rgba(181,113,43,.2),rgba(20,12,4,.5));
+  border-color:var(--ocre);transform:translateY(-3px);box-shadow:0 10px 22px rgba(181,113,43,.2);}
+.tool .ico{width:48px;height:48px;border-radius:50%;margin:0 auto 8px;display:flex;
+  align-items:center;justify-content:center;font-size:1.5rem;line-height:1;
+  background:rgba(181,113,43,.16);border:1.5px solid rgba(181,113,43,.35);transition:.2s;}
+.tool:hover:not(.locked) .ico{background:rgba(255,216,107,.18);border-color:var(--gold);}
+.tool .name{font-family:'Cinzel',serif;font-size:.85rem;font-weight:700;color:var(--sand-1);letter-spacing:.03em;line-height:1.3;}
+.tool .desc-small{font-size:.82rem;color:var(--sand-deep);margin-top:5px;font-style:italic;line-height:1.3;}
+.tool.selected{background:linear-gradient(160deg,rgba(255,216,107,.2),rgba(20,12,4,.5));border-color:var(--gold);box-shadow:0 0 0 1px var(--gold);}
+.tool.selected .ico{background:rgba(255,216,107,.28);border-color:var(--gold);}
 .tool.selected .name{color:var(--gold);}
-.tool.correct{background:rgba(61,220,132,.18);border-color:var(--chakra-glow);}
-.tool.correct::after{content:"✓";position:absolute;top:6px;right:8px;color:var(--chakra-glow);font-weight:700;font-size:1.2rem;}
-.tool.wrong{background:rgba(196,69,58,.18);border-color:var(--blood-light);}
-.tool.wrong::after{content:"✗";position:absolute;top:6px;right:8px;color:var(--blood-light);font-weight:700;font-size:1.2rem;}
+.tool.correct{background:linear-gradient(160deg,rgba(61,220,132,.2),rgba(20,12,4,.5));border-color:var(--chakra-glow);}
+.tool.correct .ico{background:rgba(61,220,132,.28);border-color:var(--chakra-glow);}
+.tool.correct::after{content:"✓";position:absolute;top:8px;right:10px;color:var(--chakra-glow);font-weight:700;font-size:1.2rem;}
+.tool.wrong{background:linear-gradient(160deg,rgba(196,69,58,.2),rgba(20,12,4,.5));border-color:var(--blood-light);}
+.tool.wrong .ico{background:rgba(196,69,58,.28);border-color:var(--blood-light);}
+.tool.wrong::after{content:"✗";position:absolute;top:8px;right:10px;color:var(--blood-light);font-weight:700;font-size:1.2rem;}
 .tool.missed{opacity:.6;border-style:dashed;}
-.tool.missed::after{content:"!";position:absolute;top:6px;right:8px;color:var(--gold);font-weight:700;font-size:1.2rem;}
+.tool.missed::after{content:"!";position:absolute;top:8px;right:10px;color:var(--gold);font-weight:700;font-size:1.2rem;}
 .tool.locked{cursor:default;}
 .feedback{padding:11px 14px;border-radius:9px;font-size:1.04rem;line-height:1.45;
   display:none;margin-top:12px;}
@@ -197,32 +204,35 @@ function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(M
 
 // SVG génériques pour chaque type de brûlure
 function burnSVG(type){
-  var base='<svg viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg">';
+  var base='<svg viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg">'+
+    '<defs>'+
+    '<linearGradient id="skinGrad2" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0%" stop-color="#f4d4a8"/><stop offset="55%" stop-color="#e0b382"/><stop offset="100%" stop-color="#b98a5c"/>'+
+    '</linearGradient>'+
+    '<filter id="softEdge2" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1"/></filter>'+
+    '</defs>';
+  var skin='<ellipse cx="140" cy="128" rx="112" ry="9" fill="#000" opacity="0.28"/>'+
+    '<rect x="18" y="76" width="244" height="48" rx="24" fill="url(#skinGrad2)" stroke="rgba(90,50,20,.4)" stroke-width="2"/>'+
+    '<ellipse cx="140" cy="86" rx="100" ry="7" fill="#fff" opacity="0.12"/>';
   var s='';
   if(type==='fermee'){
     // bone with skin intact + swelling
-    s='<rect x="20" y="80" width="240" height="40" rx="20" fill="#e8c099"/>'+
-      '<rect x="40" y="92" width="200" height="16" rx="8" fill="#d4b88a" opacity="0.85"/>'+
-      '<line x1="135" y1="80" x2="145" y2="120" stroke="#7a4020" stroke-width="3"/>'+
+    s='<line x1="135" y1="80" x2="145" y2="120" stroke="#7a4020" stroke-width="3"/>'+
       '<line x1="142" y1="84" x2="138" y2="116" stroke="#5a2810" stroke-width="2"/>'+
       '<ellipse cx="140" cy="100" rx="35" ry="22" fill="#c45040" opacity="0.35"/>';
   } else if(type==='ouverte'){
     // bone with open wound + bone visible + blood
-    s='<rect x="20" y="80" width="240" height="40" rx="20" fill="#e8c099"/>'+
-      '<rect x="40" y="92" width="200" height="16" rx="8" fill="#d4b88a" opacity="0.85"/>'+
-      '<path d="M115 80 Q140 65 165 80" fill="none" stroke="#a02818" stroke-width="3"/>'+
+    s='<path d="M115 80 Q140 65 165 80" fill="none" stroke="#a02818" stroke-width="3"/>'+
       '<polygon points="128,82 152,82 158,100 122,100" fill="#f0e0c0" stroke="#5a3010" stroke-width="1.5"/>'+
       '<ellipse cx="140" cy="85" rx="18" ry="10" fill="#9a1810" opacity="0.85"/>'+
       '<circle cx="125" cy="92" r="4" fill="#9a1810"/>'+
       '<circle cx="155" cy="95" r="3" fill="#9a1810"/>';
   } else if(type==='fissure'){
     // hairline crack
-    s='<rect x="20" y="80" width="240" height="40" rx="20" fill="#e8c099"/>'+
-      '<rect x="40" y="92" width="200" height="16" rx="8" fill="#d4b88a" opacity="0.85"/>'+
-      '<line x1="138" y1="90" x2="142" y2="110" stroke="#8a6040" stroke-width="1.5" stroke-dasharray="3,2"/>'+
+    s='<line x1="138" y1="90" x2="142" y2="110" stroke="#8a6040" stroke-width="1.5" stroke-dasharray="3,2"/>'+
       '<ellipse cx="140" cy="100" rx="20" ry="12" fill="#c4806a" opacity="0.25"/>';
   }
-  return base+s+'</svg>';
+  return base+skin+'<g filter="url(#softEdge2)">'+s+'</g>'+'</svg>';
 }
 
 // ================================================================
