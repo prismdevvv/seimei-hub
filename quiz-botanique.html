@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Seimei &mdash; Atelier Botanique & Sciences | Sunagakure</title>
+<title>Seimei — Simulation Botanique | Sunagakure</title>
 <script src="vendor/supabase.js"></script>
 <script src="config.js"></script>
 <style>
@@ -13,7 +13,7 @@
   --rust:#7a3b15;--parchment:#f0dfb8;--chakra:#6fcf97;--chakra-glow:#3ddc84;
   --blood-light:#c4453a;--gold:#ffd86b;
 }
-*{margin:0;padding:0;box-sizing:border-box;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none;}
 body{font-family:'Cormorant Garamond',serif;color:var(--parchment);min-height:100vh;overflow-x:hidden;
   background:radial-gradient(ellipse at 50% -10%,#5a3d1e 0%,transparent 55%),
     linear-gradient(160deg,#2e1d0c 0%,#1c1106 60%,#140c04 100%);}
@@ -26,10 +26,10 @@ header{text-align:center;margin-bottom:20px;}
 .back-btn a{font-family:'Cinzel',serif;font-weight:700;font-size:.82rem;letter-spacing:.05em;
   padding:8px 16px;border:1px solid var(--ocre);border-radius:9px;color:var(--sand-1);
   text-decoration:none;text-transform:uppercase;}
-.crest{width:64px;height:64px;margin:0 auto 10px;border:3px solid var(--ocre);border-radius:50%;
+.crest{width:64px;height:64px;margin:0 auto 10px;border:3px solid var(--chakra);border-radius:50%;
   display:flex;align-items:center;justify-content:center;
-  background:radial-gradient(circle,rgba(181,113,43,.25),transparent 70%);
-  box-shadow:0 0 24px rgba(181,113,43,.35);}
+  background:radial-gradient(circle,rgba(111,207,151,.2),transparent 70%);
+  box-shadow:0 0 24px rgba(111,207,151,.3);}
 .crest svg{width:36px;height:36px;}
 h1{font-family:'Cinzel',serif;font-weight:900;font-size:clamp(1.6rem,5vw,2.5rem);
   letter-spacing:.06em;color:var(--sand-1);text-shadow:0 2px 0 var(--rust),0 0 28px rgba(181,113,43,.5);}
@@ -48,66 +48,41 @@ label{display:block;font-size:1rem;color:var(--sand-deep);margin-bottom:5px;}
 input[type=text]{width:100%;padding:12px 15px;font-family:inherit;font-size:1.1rem;
   background:rgba(20,12,4,.6);color:var(--sand-1);border:1px solid var(--ocre);
   border-radius:8px;outline:none;}
-input[type=text]:focus{border-color:var(--chakra);box-shadow:0 0 12px rgba(61,220,132,.3);}
 .btn{font-family:'Cinzel',serif;font-weight:700;letter-spacing:.05em;cursor:pointer;border:none;
   border-radius:9px;padding:12px 22px;font-size:.92rem;text-transform:uppercase;
   background:linear-gradient(160deg,var(--ocre),var(--ocre-deep));color:#fff5e6;
-  box-shadow:0 5px 0 var(--rust),0 8px 16px rgba(0,0,0,.4);transition:transform .12s,box-shadow .12s;
-  text-decoration:none;display:inline-block;}
+  box-shadow:0 5px 0 var(--rust),0 8px 16px rgba(0,0,0,.4);transition:transform .12s,box-shadow .12s;}
 .btn:hover{transform:translateY(-2px);}
-.btn:active{transform:translateY(3px);box-shadow:0 2px 0 var(--rust);}
-.btn:disabled{opacity:.4;cursor:not-allowed;transform:none !important;box-shadow:0 5px 0 var(--rust) !important;}
 .btn.ghost{background:transparent;border:1px solid var(--ocre);box-shadow:none;color:var(--sand-1);font-size:.82rem;padding:7px 14px;}
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
 .prog-wrap{flex:1;height:8px;background:rgba(20,12,4,.5);border-radius:6px;overflow:hidden;
   border:1px solid rgba(181,113,43,.3);margin:0 14px;}
 .prog-fill{height:100%;background:linear-gradient(90deg,var(--ocre),var(--gold));width:0;transition:width .4s;}
 .case-lbl{font-family:'Cinzel',serif;font-size:.88rem;color:var(--sand-deep);}
-.scen-tag{display:inline-block;font-family:'Cinzel',serif;font-size:.8rem;letter-spacing:.08em;
-  padding:3px 11px;border-radius:6px;background:rgba(181,113,43,.25);color:var(--gold);
-  margin-bottom:8px;text-transform:uppercase;}
-.desc{font-size:1.05rem;line-height:1.5;margin-bottom:14px;color:var(--parchment);}
-.scene{display:flex;justify-content:center;margin:14px 0;}
-.scene-area{width:120px;height:120px;border-radius:50%;
-  border:3px solid var(--rust);background:radial-gradient(circle,rgba(181,113,43,.18),rgba(20,12,4,.5));
-  box-shadow:inset 0 0 25px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;
-  font-size:3.2rem;}
-.instruction{font-size:1.05rem;color:var(--sand-1);text-align:center;margin:12px 0 6px;font-style:italic;}
-.tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(152px,1fr));gap:12px;margin-top:14px;}
-.tool{position:relative;background:linear-gradient(160deg,rgba(240,223,184,.06),rgba(20,12,4,.55));
-  border:1.5px solid rgba(181,113,43,.4);border-radius:14px;padding:18px 12px 14px;cursor:pointer;
-  transition:.2s;text-align:center;user-select:none;box-shadow:0 4px 14px rgba(0,0,0,.3);}
-.tool:hover:not(.locked){background:linear-gradient(160deg,rgba(181,113,43,.2),rgba(20,12,4,.5));
-  border-color:var(--ocre);transform:translateY(-3px);box-shadow:0 10px 22px rgba(181,113,43,.2);}
-.tool .ico{width:48px;height:48px;border-radius:50%;margin:0 auto 8px;display:flex;
-  align-items:center;justify-content:center;font-size:1.5rem;line-height:1;
-  background:rgba(181,113,43,.16);border:1.5px solid rgba(181,113,43,.35);transition:.2s;}
-.tool:hover:not(.locked) .ico{background:rgba(255,216,107,.18);border-color:var(--gold);}
-.tool .name{font-family:'Cinzel',serif;font-size:.85rem;font-weight:700;color:var(--sand-1);letter-spacing:.03em;line-height:1.3;}
-.tool .desc-small{font-size:.82rem;color:var(--sand-deep);margin-top:5px;font-style:italic;line-height:1.3;}
-.tool.selected{background:linear-gradient(160deg,rgba(255,216,107,.2),rgba(20,12,4,.5));border-color:var(--gold);box-shadow:0 0 0 1px var(--gold);}
-.tool.selected .ico{background:rgba(255,216,107,.28);border-color:var(--gold);}
-.tool.selected .name{color:var(--gold);}
-.tool.correct{background:linear-gradient(160deg,rgba(61,220,132,.2),rgba(20,12,4,.5));border-color:var(--chakra-glow);}
-.tool.correct .ico{background:rgba(61,220,132,.28);border-color:var(--chakra-glow);}
-.tool.correct::after{content:"✓";position:absolute;top:8px;right:10px;color:var(--chakra-glow);font-weight:700;font-size:1.2rem;}
-.tool.wrong{background:linear-gradient(160deg,rgba(196,69,58,.2),rgba(20,12,4,.5));border-color:var(--blood-light);}
-.tool.wrong .ico{background:rgba(196,69,58,.28);border-color:var(--blood-light);}
-.tool.wrong::after{content:"✗";position:absolute;top:8px;right:10px;color:var(--blood-light);font-weight:700;font-size:1.2rem;}
-.tool.missed{opacity:.6;border-style:dashed;}
-.tool.missed::after{content:"!";position:absolute;top:8px;right:10px;color:var(--gold);font-weight:700;font-size:1.2rem;}
-.tool.locked{cursor:default;}
-.feedback{padding:11px 14px;border-radius:9px;font-size:1.04rem;line-height:1.45;
-  display:none;margin-top:12px;}
+.patient-zone{display:flex;justify-content:center;margin:14px 0;}
+.patient-card{width:220px;padding:18px;border-radius:14px;text-align:center;
+  background:rgba(20,12,4,.55);border:2px dashed rgba(181,113,43,.4);transition:.2s;}
+.patient-card.over{border-color:var(--gold);background:rgba(255,216,107,.1);}
+.patient-card.ok{border-color:var(--chakra);border-style:solid;box-shadow:0 0 20px rgba(61,220,132,.3);}
+.patient-card.bad{border-color:var(--blood-light);border-style:solid;box-shadow:0 0 20px rgba(196,69,58,.4);}
+.patient-icon{font-size:2rem;margin-bottom:6px;}
+.patient-note{font-size:1rem;color:var(--parchment);line-height:1.4;}
+.bags-row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:16px;}
+.bag{width:120px;padding:12px 8px;border-radius:10px;text-align:center;cursor:grab;
+  background:rgba(111,207,151,.1);border:1.5px solid rgba(111,207,151,.4);
+  font-family:'Cinzel',serif;font-weight:700;color:var(--chakra-glow);transition:.15s;touch-action:none;font-size:.85rem;}
+.bag:active{cursor:grabbing;}
+.bag.dragging{opacity:.5;}
+.instr{text-align:center;font-size:1rem;color:var(--sand-deep);font-style:italic;margin:12px 0 6px;}
+.feedback{padding:11px 14px;border-radius:9px;font-size:1.04rem;line-height:1.4;
+  display:none;margin-top:8px;}
 .feedback.ok{display:block;background:rgba(61,220,132,.1);border:1px solid rgba(61,220,132,.4);color:var(--chakra);}
 .feedback.no{display:block;background:rgba(196,69,58,.12);border:1px solid rgba(196,69,58,.45);color:#ffcaa0;}
-.controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px;}
 #result{display:none;text-align:center;}
 .grade{font-family:'Cinzel',serif;font-weight:900;font-size:3rem;margin:6px 0;}
 .grade.s{color:var(--chakra-glow);text-shadow:0 0 24px rgba(61,220,132,.6);}
 .grade.a{color:var(--gold);}
 .grade.b{color:var(--sand-1);}
-.grade.c{color:var(--sand-deep);}
 .grade.f{color:var(--blood-light);}
 .verdict{font-size:1.12rem;margin-bottom:14px;line-height:1.5;}
 .rrow{display:flex;justify-content:space-between;padding:7px 0;
@@ -118,33 +93,28 @@ input[type=text]:focus{border-color:var(--chakra);box-shadow:0 0 12px rgba(61,22
 .cloud{margin-top:10px;font-size:.97rem;border-radius:8px;padding:10px 12px;
   color:var(--sand-deep);border:1px solid rgba(181,113,43,.4);background:rgba(20,12,4,.4);}
 .cloud.ok{color:var(--chakra);border-color:rgba(61,220,132,.45);background:rgba(61,220,132,.08);}
-.cloud.warn{color:#ffcaa0;border-color:rgba(196,69,58,.5);background:rgba(196,69,58,.1);}
 footer{text-align:center;margin-top:26px;color:var(--sand-deep);font-style:italic;}
 footer .seal{color:var(--ocre);font-family:'Cinzel',serif;}
+.controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px;}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="back-btn"><a href="botanique.html">&larr; Retour au cours</a></div>
+  <div class="back-btn"><a href="botanique.html">← Retour au cours</a></div>
   <header>
-    <div class="crest">
-      <svg viewBox="0 0 100 100" fill="none">
-        <circle cx="50" cy="50" r="30" stroke="#b5712b" stroke-width="4"/>
-        <path d="M50 22 L58 44 L50 50 L42 44 Z" fill="#b5712b"/>
-        <path d="M50 78 L42 56 L50 50 L58 56 Z" fill="#b5712b"/>
-        <circle cx="50" cy="50" r="6" fill="#8a4f1a"/>
-      </svg>
-    </div>
-    <h1>Atelier Botanique &amp; Sciences</h1>
-    <div class="sub">Section M&eacute;dicale &mdash; Seimei &middot; Sunagakure</div>
+    <div class="crest"><svg viewBox="0 0 24 24" fill="none" stroke="#6fcf97" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M7 20h10"/><path d="M12 20v-6"/><path d="M12 14c-3 0-6-2.5-6-6 0-3.5 3-5.5 6-6 3 .5 6 2.5 6 6 0 3.5-3 6-6 6z"/>
+    </svg></div>
+    <h1>Simulation Botanique</h1>
+    <div class="sub">Section Médicale — Seimei · Sunagakure</div>
     <div class="divider"></div>
   </header>
 
   <div id="intro">
     <div class="panel">
       <h2>Briefing</h2>
-      <p class="lead">Un patient a besoin d&rsquo;un rem&egrave;de naturel. Pour chaque cas, choisis la <strong>bonne plante</strong> du registre.</p>
-      <p class="hint" style="margin-top:8px;">&#9888; Attention : certaines plantes sont des <strong>pi&egrave;ges</strong> &mdash; mauvais dosage ou mauvaise indication.</p>
+      <p class="lead">Un patient présente un mal précis. Glisse la <strong>plante du registre</strong> qui correspond jusqu'à lui.</p>
+      <p class="hint" style="margin-top:8px;">🌿 5 patients à soigner avec le bon remède naturel.</p>
     </div>
     <div class="panel">
       <h2>Identification</h2>
@@ -161,38 +131,36 @@ footer .seal{color:var(--ocre);font-family:'Cinzel',serif;}
   <div id="game" style="display:none;">
     <div class="panel">
       <div class="topbar">
-        <span class="case-lbl" id="caseLbl">Cas 1/4</span>
+        <span class="case-lbl" id="caseLbl">Patient 1/5</span>
         <div class="prog-wrap"><div class="prog-fill" id="progFill"></div></div>
         <span class="case-lbl" id="scoreLbl">0/0</span>
       </div>
-      <div class="scen-tag" id="scenTag"></div>
-      <p class="desc" id="descTxt"></p>
-      <div class="scene"><div class="scene-area" id="sceneArea"></div></div>
-      <div class="instruction">S&eacute;lectionne les gestes appropri&eacute;s, puis valide.</div>
-      <div class="tool-grid" id="toolGrid"></div>
-      <div class="feedback" id="feedback"></div>
-      <div class="controls">
-        <button class="btn" id="nextBtn" disabled>Valider</button>
+      <div class="patient-zone">
+        <div class="patient-card" id="patientCard">
+          <div class="patient-icon" id="patientIcon">🤒</div>
+          <div class="patient-note" id="patientNote"></div>
+        </div>
       </div>
+      <div class="instr">Glisse la bonne plante jusqu'au patient.</div>
+      <div class="bags-row" id="bagsRow"></div>
+      <div class="feedback" id="feedback"></div>
     </div>
   </div>
 
   <div id="result">
     <div class="panel">
-      <h2>Rapport d&rsquo;&eacute;valuation</h2>
-      <div class="grade" id="gradeLetter">&mdash;</div>
+      <h2>Rapport d'évaluation</h2>
+      <div class="grade" id="gradeLetter">—</div>
       <div class="verdict" id="verdict"></div>
       <div id="reportBox" style="background:rgba(20,12,4,.55);border:1px dashed var(--ocre);border-radius:12px;padding:16px;margin:14px 0;text-align:left;"></div>
-      <div class="cloud" id="cloudStatus">&#8987; Envoi...</div>
-      <div style="text-align:center;font-style:italic;color:var(--sand-deep);margin-top:12px;">Cachet &mdash; Seimei, Sunagakure</div>
+      <div class="cloud" id="cloudStatus">⏳ Envoi...</div>
       <div class="controls" style="margin-top:14px;">
         <button class="btn ghost" id="retryBtn">Recommencer</button>
         <button class="btn" id="newPlayerBtn">Nouvel apprenti</button>
       </div>
     </div>
   </div>
-
-  <footer>Outil p&eacute;dagogique &middot; <span class="seal">Seimei</span> &middot; Sunagakure</footer>
+  <footer>Outil pédagogique · <span class="seal">Seimei</span> · Sunagakure</footer>
 </div>
 
 <script>
@@ -200,62 +168,25 @@ footer .seal{color:var(--ocre);font-family:'Cinzel',serif;}
 var el=function(id){return document.getElementById(id);};
 function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
 
+var ALL_PLANTS=["Catharanthus roseus","Digitalis purpurea","Papaver somniferum","Cinchona officinalis","Artemisia annua","Aloe vera","Salix alba","Taxus brevifolia","Oryza sativa","Cactus / Opuntia"];
+
 var CASES=[
-  {
-    tag:"Douleur légère et fièvre modérée",
-    icon:"🌿",
-    desc:"Un shinobi revient de mission avec des maux de tête et de la fièvre légère.",
-    good:["saule_blanc_bot"],
-    bad:["pavot_dispro_bot","digitale_inutile"]
-  },
-  {
-    tag:"Insuffisance cardiaque",
-    icon:"❤️",
-    desc:"Un patient présente un rythme cardiaque faible et irrégulier, contractions insuffisantes.",
-    good:["digitale_bot"],
-    bad:["quinquina_bot","cactus_bot"]
-  },
-  {
-    tag:"Protection de l'estomac",
-    icon:"🌵",
-    desc:"Un patient souffre de brûlures gastriques après un repas trop épicé.",
-    good:["cactus_opuntia_bot"],
-    bad:["aloe_vera_bot_wrong","riz_bot"]
-  },
-  {
-    tag:"Cicatrisation d'une brûlure légère",
-    icon:"🔥",
-    desc:"Un shinobi s'est légèrement brûlé à l'entraînement. La peau est rouge et sèche.",
-    good:["aloe_vera_bot"],
-    bad:["if_pacifique_bot","pavot_bot_wrong"]
-  }
+  {icon:"🌡️",note:"Douleur légère et fièvre modérée.",plant:"Salix alba"},
+  {icon:"❤️",note:"Insuffisance cardiaque, contractions faibles.",plant:"Digitalis purpurea"},
+  {icon:"🔥",note:"Brûlure légère à l'entraînement.",plant:"Aloe vera"},
+  {icon:"🌵",note:"Brûlures gastriques après un repas épicé.",plant:"Cactus / Opuntia"},
+  {icon:"🦟",note:"Fièvres parasitaires après une mission en marécage.",plant:"Artemisia annua"}
 ];
 
-var TOOLS={
-  saule_blanc_bot:{ico:"🌿",name:"Saule blanc",desc:"Analgésique naturel (aspirine)"},
-  pavot_dispro_bot:{ico:"🌺",name:"Pavot somnifère",desc:"PIÈGE — disproportionné pour douleur légère"},
-  digitale_inutile:{ico:"🌸",name:"Digitale pourpre",desc:"PIÈGE — traite le cœur, pas la fièvre"},
-  digitale_bot:{ico:"🌸",name:"Digitale pourpre",desc:"Régule le rythme cardiaque"},
-  quinquina_bot:{ico:"🌳",name:"Quinquina",desc:"PIÈGE — traite les piqûres, pas le cœur"},
-  cactus_bot:{ico:"🌵",name:"Cactus / Opuntia",desc:"PIÈGE — protection digestive, pas cardiaque"},
-  cactus_opuntia_bot:{ico:"🌵",name:"Cactus / Opuntia",desc:"Gel protecteur pour l'estomac"},
-  aloe_vera_bot_wrong:{ico:"🌱",name:"Aloe vera",desc:"PIÈGE — cicatrisant cutané, pas digestif"},
-  riz_bot:{ico:"🌾",name:"Riz",desc:"PIÈGE — nutrition, pas soin digestif"},
-  aloe_vera_bot:{ico:"🌱",name:"Aloe vera",desc:"Cicatrisant, spécialité de Suna"},
-  if_pacifique_bot:{ico:"🌲",name:"If du Pacifique",desc:"PIÈGE — utilisé en chimiothérapie"},
-  pavot_bot_wrong:{ico:"🌺",name:"Pavot somnifère",desc:"PIÈGE — analgésique, pas cicatrisant"}
-};
-
-var SEQ=[];
-var NB=4;
-var ST={name:"",idx:0,selected:[],answered:false,correctCount:0,results:[]};
+var NB=5,seq=[],idx=0,score=0,results=[],playerName='';
+var dragEl=null;
 
 function startGame(){
   var nm=el('nameInput').value.trim();
   if(!nm){el('nameInput').style.borderColor='var(--blood-light)';
     setTimeout(function(){el('nameInput').style.borderColor='';},900);return;}
-  ST.name=nm; ST.idx=0; ST.correctCount=0; ST.results=[];
-  SEQ=shuffle(CASES);
+  playerName=nm; idx=0; score=0; results=[];
+  seq=shuffle(CASES);
   el('intro').style.display='none'; el('result').style.display='none';
   el('game').style.display='block';
   loadCase();
@@ -263,95 +194,105 @@ function startGame(){
 }
 
 function loadCase(){
-  var c=SEQ[ST.idx];
-  ST.selected=[]; ST.answered=false;
+  var c=seq[idx];
+  el('caseLbl').textContent='Patient '+(idx+1)+'/'+NB;
+  el('scoreLbl').textContent=score+'/'+idx;
+  el('progFill').style.width=Math.round(idx/NB*100)+'%';
+  el('patientIcon').textContent=c.icon;
+  el('patientNote').textContent=c.note;
+  el('patientCard').className='patient-card';
   el('feedback').className='feedback'; el('feedback').textContent='';
-  el('nextBtn').disabled=true;
-  el('nextBtn').textContent='Valider';
-  el('progFill').style.width=Math.round(ST.idx/NB*100)+'%';
-  el('caseLbl').textContent='Cas '+(ST.idx+1)+'/'+NB;
-  el('scoreLbl').textContent=ST.correctCount+'/'+ST.idx;
-  el('scenTag').textContent=c.tag;
-  el('descTxt').textContent=c.desc;
-  el('sceneArea').textContent=c.icon;
-  var allKeys=c.good.concat(c.bad);
-  var displayed=shuffle(allKeys);
-  var grid=el('toolGrid'); grid.innerHTML='';
-  displayed.forEach(function(k){
-    var t=TOOLS[k];
-    if(!t)return;
+
+  var wrongPool=shuffle(ALL_PLANTS.filter(function(p){return p!==c.plant;})).slice(0,3);
+  var displayed=shuffle([c.plant].concat(wrongPool));
+
+  var row=el('bagsRow'); row.innerHTML='';
+  displayed.forEach(function(p){
     var div=document.createElement('div');
-    div.className='tool'; div.dataset.k=k;
-    div.innerHTML='<span class="ico">'+t.ico+'</span>'+
-      '<div class="name">'+t.name+'</div>'+
-      '<div class="desc-small">'+t.desc.replace('PIÈGE — ','')+'</div>';
-    div.addEventListener('click',function(){toggleTool(k,div);});
-    grid.appendChild(div);
+    div.className='bag'; div.dataset.plant=p;
+    div.textContent=p;
+    makeDraggable(div,c);
+    row.appendChild(div);
   });
 }
 
-function toggleTool(k,div){
-  if(ST.answered)return;
-  var i=ST.selected.indexOf(k);
-  if(i>=0){ST.selected.splice(i,1);div.classList.remove('selected');}
-  else{ST.selected.push(k);div.classList.add('selected');}
-  el('nextBtn').disabled=ST.selected.length===0;
-}
-
-function validate(){
-  if(ST.answered){nextCase();return;}
-  ST.answered=true;
-  var c=SEQ[ST.idx];
-  var grid=el('toolGrid');
-  var goodSelected=0, badSelected=0, missed=0;
-  grid.querySelectorAll('.tool').forEach(function(div){
-    var k=div.dataset.k;
-    var isGood=c.good.indexOf(k)>=0;
-    var isBad=c.bad.indexOf(k)>=0;
-    var isSel=ST.selected.indexOf(k)>=0;
-    div.classList.add('locked');
-    if(isSel && isGood){div.classList.add('correct');goodSelected++;}
-    else if(isSel && isBad){div.classList.add('wrong');badSelected++;}
-    else if(!isSel && isGood){div.classList.add('missed');missed++;}
-  });
-  var perfect=(goodSelected===c.good.length && badSelected===0 && missed===0);
-  if(perfect){
-    ST.correctCount++;
-    el('feedback').className='feedback ok';
-    el('feedback').textContent='✓ Parfait ! Tu as choisi les bons gestes sans aucun piège.';
-  } else {
-    var msg='✗ ';
-    if(badSelected>0) msg+=badSelected+' erreur(s) — gestes à proscrire. ';
-    if(missed>0) msg+=missed+' geste(s) essentiel(s) oublié(s). ';
-    el('feedback').className='feedback no';
-    el('feedback').textContent=msg.trim();
+function makeDraggable(bag,caseObj){
+  function start(e){
+    e.preventDefault();
+    var pos=getPos(e);
+    dragEl=bag.cloneNode(true);
+    dragEl.style.position='fixed'; dragEl.style.zIndex=999; dragEl.style.pointerEvents='none';
+    dragEl.style.left=(pos.x-60)+'px'; dragEl.style.top=(pos.y-25)+'px';
+    document.body.appendChild(dragEl);
+    bag.classList.add('dragging');
+    function move(ev){
+      var p2=getPos(ev);
+      dragEl.style.left=(p2.x-60)+'px'; dragEl.style.top=(p2.y-25)+'px';
+      var card=el('patientCard');
+      var r=card.getBoundingClientRect();
+      var over=p2.x>=r.left&&p2.x<=r.right&&p2.y>=r.top&&p2.y<=r.bottom;
+      card.classList.toggle('over',over);
+    }
+    function end(ev){
+      document.removeEventListener('mousemove',move);
+      document.removeEventListener('mouseup',end);
+      document.removeEventListener('touchmove',move);
+      document.removeEventListener('touchend',end);
+      var p2=getPos(ev.changedTouches?{clientX:ev.changedTouches[0].clientX,clientY:ev.changedTouches[0].clientY}:ev);
+      var card=el('patientCard');
+      var r=card.getBoundingClientRect();
+      var over=p2.x>=r.left&&p2.x<=r.right&&p2.y>=r.top&&p2.y<=r.bottom;
+      card.classList.remove('over');
+      if(dragEl){dragEl.remove();dragEl=null;}
+      bag.classList.remove('dragging');
+      if(over) onDrop(bag.dataset.plant,caseObj);
+    }
+    document.addEventListener('mousemove',move);
+    document.addEventListener('mouseup',end);
+    document.addEventListener('touchmove',move,{passive:false});
+    document.addEventListener('touchend',end);
   }
-  ST.results.push({tag:c.tag,good:goodSelected,total_good:c.good.length,bad:badSelected,missed:missed,perfect:perfect});
-  el('nextBtn').textContent=ST.idx<NB-1?'Cas suivant':'Voir le résultat';
-  el('nextBtn').disabled=false;
+  bag.addEventListener('mousedown',start);
+  bag.addEventListener('touchstart',start,{passive:false});
 }
 
-function nextCase(){
-  if(ST.idx<NB-1){ST.idx++;loadCase();}
-  else{finish();}
-  window.scrollTo({top:0,behavior:'smooth'});
+function getPos(e){
+  var src=e.touches?e.touches[0]:e;
+  return {x:src.clientX,y:src.clientY};
+}
+
+function onDrop(plant,caseObj){
+  var ok=plant===caseObj.plant;
+  var card=el('patientCard');
+  card.className='patient-card '+(ok?'ok':'bad');
+  var fb=el('feedback');
+  fb.className='feedback '+(ok?'ok':'no');
+  fb.textContent=ok?'✔ Bon remède — patient soigné.':'✘ Mauvaise plante — traitement inadapté.';
+  if(ok)score++;
+  results.push({note:caseObj.note,ok:ok,used:plant,correct:caseObj.plant});
+  el('scoreLbl').textContent=score+'/'+(idx+1);
+  setTimeout(next,1200);
+}
+
+function next(){
+  idx++;
+  if(idx>=NB){finish();return;}
+  loadCase();
 }
 
 function finish(){
   el('progFill').style.width='100%';
-  var score=Math.round(ST.correctCount/NB*100);
-  var g=gradeFor(score);
+  var pct=Math.round(score/NB*100);
+  var g=gradeFor(pct);
   el('gradeLetter').textContent=g.l; el('gradeLetter').className='grade '+g.cls;
   el('verdict').textContent=g.txt;
   var box=el('reportBox'); box.innerHTML='';
-  addRow(box,'Apprenti',ST.name);
-  ST.results.forEach(function(r,i){
-    addRow(box,'Cas '+(i+1)+' — '+r.tag,
-      r.perfect?'✓ Parfait':(r.good+'/'+r.total_good+' bons · '+r.bad+' pièges · '+r.missed+' oublis'));
+  addRow(box,'Apprenti',playerName);
+  results.forEach(function(r,i){
+    addRow(box,'Patient '+(i+1)+' — '+r.correct,r.ok?'✓ Correct':'✗ '+r.used);
   });
-  addRow(box,'Cas parfaits',ST.correctCount+' / '+NB);
-  addRow(box,'SCORE',score+' / 100');
-  save({name:ST.name,correct:ST.correctCount,total:NB,score:score,grade:g.l});
+  addRow(box,'SCORE',score+' / '+NB);
+  save({name:playerName,correct:score,total:NB,score:pct,grade:g.l});
   el('game').style.display='none'; el('result').style.display='block';
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -360,11 +301,10 @@ function addRow(p,k,v){var d=document.createElement('div');d.className='rrow';
   d.innerHTML='<span class="k">'+k+'</span><span class="v">'+v+'</span>';p.appendChild(d);}
 
 function gradeFor(s){
-  if(s>=95)return {l:"S",cls:"s",txt:"Maîtrise parfaite des 4 fondamentaux. La Seimei te félicite."};
-  if(s>=80)return {l:"A",cls:"a",txt:"Très bonne maîtrise. Tu es prêt pour le terrain."};
-  if(s>=60)return {l:"B",cls:"b",txt:"Bonnes bases, quelques détails à revoir."};
-  if(s>=40)return {l:"C",cls:"c",txt:"Niveau passable. Révise les conduites à tenir."};
-  return {l:"D",cls:"f",txt:"Connaissances insuffisantes. Reprends le cours."};
+  if(s>=95)return {l:"S",cls:"s",txt:"Maîtrise parfaite du registre botanique."};
+  if(s>=75)return {l:"A",cls:"a",txt:"Bonne connaissance des plantes, une erreur à revoir."};
+  if(s>=50)return {l:"B",cls:"b",txt:"Résultat correct mais des confusions subsistent."};
+  return {l:"D",cls:"f",txt:"Trop d'erreurs. Revois le registre des plantes."};
 }
 
 function save(row){
@@ -375,16 +315,15 @@ function save(row){
   note.textContent="⏳ Envoi..."; note.className="cloud";
   try{
     var sb=window.supabase.createClient(URL,KEY);
-    sb.from('botanique_atelier_scores').insert([row]).then(function(res){
+    sb.from('botanique_scores').insert([row]).then(function(res){
       if(res.error){note.textContent="⚠ Erreur : "+res.error.message;note.className="cloud warn";}
-      else{note.textContent="✓ Score transmis au formateur.";note.className="cloud ok";}
+      else{note.textContent="✓ Score transmis.";note.className="cloud ok";}
     },function(){note.textContent="⚠ Erreur réseau.";note.className="cloud warn";});
   }catch(e){note.textContent="⚠ Erreur.";note.className="cloud warn";}
 }
 
 el('startBtn').addEventListener('click',startGame);
 el('nameInput').addEventListener('keydown',function(e){if(e.key==='Enter')startGame();});
-el('nextBtn').addEventListener('click',validate);
 el('retryBtn').addEventListener('click',startGame);
 el('newPlayerBtn').addEventListener('click',function(){
   el('nameInput').value='';
