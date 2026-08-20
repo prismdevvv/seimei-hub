@@ -71,6 +71,18 @@ h1{font-family:'Cinzel',serif;font-weight:900;font-size:clamp(1.5rem,4.5vw,2.3re
 .patient-age{font-size:.95rem;color:var(--sand-deep);margin-bottom:8px;}
 .patient-situation{font-size:1.05rem;color:var(--sand-deep);font-style:italic;line-height:1.5;}
 
+/* Live monitor */
+.monitor-wrap{background:#0a0805;border:2px solid rgba(61,220,132,.35);border-radius:12px;
+  padding:8px 10px;margin-bottom:14px;box-shadow:inset 0 0 24px rgba(0,0,0,.6);}
+.monitor-wrap canvas{display:block;width:100%;height:90px;}
+.timer-wrap{margin-bottom:12px;}
+.timer-label{display:flex;justify-content:space-between;font-family:'Cinzel',serif;font-size:.8rem;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--sand-deep);margin-bottom:5px;}
+.timer-label .t-alert{color:var(--blood-light);}
+.timer-track{height:8px;border-radius:5px;background:rgba(20,12,4,.6);border:1px solid rgba(181,113,43,.35);overflow:hidden;}
+.timer-fill{height:100%;background:linear-gradient(90deg,var(--chakra),var(--gold));width:100%;transition:width linear;}
+.timer-fill.danger{background:linear-gradient(90deg,var(--gold),var(--blood-light));}
+
 /* Vital signs dashboard */
 .vitals-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;}
 .vital-box{background:rgba(8,5,2,.7);border:2px solid rgba(181,113,43,.3);border-radius:10px;
@@ -225,6 +237,13 @@ footer .seal{color:var(--ocre);font-family:'Cinzel',serif;}
         <div class="patient-age" id="patientAge"></div>
         <div class="patient-situation" id="patientSituation"></div>
       </div>
+
+      <div class="timer-wrap">
+        <div class="timer-label"><span>Temps de lecture</span><span id="roundTimerCount" class="t-alert">--</span></div>
+        <div class="timer-track"><div class="timer-fill" id="roundTimerFill"></div></div>
+      </div>
+
+      <div class="monitor-wrap"><canvas id="ecgCvs"></canvas></div>
 
       <div class="vitals-grid" id="vitalsGrid">
         <div class="vital-box" id="vital-pouls" data-key="pouls">
@@ -556,6 +575,100 @@ footer .seal{color:var(--ocre);font-family:'Cinzel',serif;}
 
     updateProgress();
     setupVitalClicks();
+    startMonitor(sc);
+    startRoundTimer();
+  }
+
+  /* ===== Live ECG monitor ===== */
+  var ecgCvs, ecgCtx, ecgW, ecgH, ecgAnim, ecgT0, ecgBpm, jitterInterval;
+
+  function initEcgCanvas(){
+    ecgCvs = el('ecgCvs');
+    ecgCtx = ecgCvs.getContext('2d');
+    resizeEcg();
+  }
+  function resizeEcg(){
+    var wrap = ecgCvs.parentElement;
+    ecgW = wrap.clientWidth; ecgH = 90;
+    ecgCvs.width = ecgW; ecgCvs.height = ecgH;
+  }
+
+  function startMonitor(sc){
+    if(!ecgCvs) initEcgCanvas();
+    resizeEcg();
+    ecgBpm = sc.pouls;
+    ecgT0 = Date.now();
+    if(ecgAnim) cancelAnimationFrame(ecgAnim);
+    drawEcgFrame();
+
+    // Live jitter on displayed values (cosmetic only, grading uses sc directly)
+    if(jitterInterval) clearInterval(jitterInterval);
+    jitterInterval = setInterval(function(){
+      if(validated) return;
+      var jp = sc.pouls + Math.round((Math.random()-0.5)*4);
+      var jf = sc.fr + Math.round((Math.random()-0.5)*2);
+      var jt = (sc.temp + (Math.random()-0.5)*0.2).toFixed(1);
+      if(el('val-pouls')) el('val-pouls').textContent = jp;
+      if(el('val-fr')) el('val-fr').textContent = jf;
+      if(el('val-temp')) el('val-temp').textContent = jt;
+    },900);
+  }
+
+  function stopMonitor(){
+    if(ecgAnim) cancelAnimationFrame(ecgAnim);
+    if(jitterInterval) clearInterval(jitterInterval);
+  }
+
+  function drawEcgFrame(){
+    ecgCtx.clearRect(0,0,ecgW,ecgH);
+    ecgCtx.strokeStyle='rgba(61,220,132,.9)';
+    ecgCtx.lineWidth=2;
+    ecgCtx.beginPath();
+    var period = 60/Math.max(20,ecgBpm); // seconds per beat
+    var elapsed = (Date.now()-ecgT0)/1000;
+    var pxPerSec = ecgW/4; // 4s window scroll speed baseline
+    for(var x=0;x<ecgW;x++){
+      var tAtX = elapsed - (ecgW-x)/pxPerSec;
+      var phase = ((tAtX % period)+period)%period / period;
+      var y = ecgH*0.55;
+      if(phase>0.42 && phase<0.5){
+        y -= (phase-0.42)/0.08*ecgH*0.6;
+      } else if(phase>=0.5 && phase<0.58){
+        y -= (0.58-phase)/0.08*ecgH*0.6;
+      } else if(phase>=0.58 && phase<0.64){
+        y += (phase-0.58)/0.06*ecgH*0.22;
+      } else if(phase>=0.64 && phase<0.7){
+        y += (0.7-phase)/0.06*ecgH*0.22;
+      }
+      if(x===0) ecgCtx.moveTo(x,y); else ecgCtx.lineTo(x,y);
+    }
+    ecgCtx.stroke();
+    ecgAnim = requestAnimationFrame(drawEcgFrame);
+  }
+
+  function startRoundTimer(){
+    clearRoundTimer();
+    var seconds=40;
+    var fill=el('roundTimerFill'), countLbl=el('roundTimerCount');
+    fill.style.transition='none'; fill.style.width='100%'; fill.className='timer-fill';
+    void fill.offsetWidth;
+    fill.style.transition='width '+seconds+'s linear';
+    fill.style.width='0%';
+    var remaining=seconds;
+    countLbl.textContent=remaining+'s';
+    window._roundInterval=setInterval(function(){
+      remaining--;
+      if(remaining<=8) fill.className='timer-fill danger';
+      countLbl.textContent=Math.max(remaining,0)+'s';
+      if(remaining<=0) clearInterval(window._roundInterval);
+    },1000);
+    window._roundTimeout=setTimeout(function(){
+      if(!validated) validateRound();
+    },seconds*1000);
+  }
+  function clearRoundTimer(){
+    if(window._roundInterval) clearInterval(window._roundInterval);
+    if(window._roundTimeout) clearTimeout(window._roundTimeout);
   }
 
   function setupVitalClicks(){
@@ -616,7 +729,13 @@ footer .seal{color:var(--ocre);font-family:'Cinzel',serif;}
   function validateRound(){
     if(validated) return;
     validated = true;
+    stopMonitor();
+    clearRoundTimer();
     var sc = scenarios[currentRound];
+    el('val-pouls').textContent = sc.pouls;
+    el('val-ta').textContent = sc.taSys + ' / ' + sc.taDia;
+    el('val-fr').textContent = sc.fr;
+    el('val-temp').textContent = sc.temp.toFixed(1);
     var roundCorrect = true;
 
     // Check vital marks
