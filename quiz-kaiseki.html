@@ -8,35 +8,27 @@
 <script src="config.js"></script>
 <link rel="stylesheet" href="shared.css">
 <style>
-.metric-bar{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:.95rem;
-  margin-bottom:10px;color:var(--sand-deep);}
-.metric-bar .val{font-family:'Cinzel',serif;font-weight:700;color:var(--sand-1);}
-.metric-bar .val.good{color:var(--chakra-glow);}
-.metric-bar .val.bad{color:var(--blood-light);}
-.metric-bar .val.warn{color:var(--gold);}
 .case-hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;flex-wrap:wrap;gap:6px;}
 .case-label{font-family:'Cinzel',serif;font-weight:700;font-size:.78rem;letter-spacing:.08em;
   text-transform:uppercase;color:var(--ocre);}
 .case-count{font-size:.85rem;color:var(--sand-deep);}
 .patient-line{font-size:1.08rem;color:var(--sand-1);font-weight:600;margin-bottom:10px;text-align:center;}
-.found-tally{font-family:'Cinzel',serif;font-weight:700;font-size:.9rem;color:var(--gold);text-align:center;margin-bottom:8px;}
+.status-line{font-family:'Cinzel',serif;font-weight:700;font-size:.9rem;text-align:center;margin-bottom:8px;
+  color:var(--gold);min-height:1.3em;}
+.status-line.ok{color:var(--chakra-glow);}
+.status-line.no{color:var(--blood-light);}
 .timer-track{height:9px;border-radius:6px;background:rgba(20,12,4,.6);border:1px solid rgba(181,113,43,.35);overflow:hidden;margin-bottom:12px;}
 .timer-fill{height:100%;background:linear-gradient(90deg,var(--chakra),var(--gold));width:100%;}
 .timer-fill.danger{background:linear-gradient(90deg,var(--gold),var(--blood-light));}
 .scan-area{position:relative;width:100%;max-width:300px;height:440px;margin:0 auto;border-radius:14px;
-  border:2px solid rgba(181,113,43,.45);
-  background:
-    radial-gradient(ellipse at 50% 25%,rgba(111,207,151,.06),transparent 60%),
-    repeating-linear-gradient(0deg,rgba(240,223,184,.025) 0px,rgba(240,223,184,.025) 1px,transparent 1px,transparent 22px),
-    repeating-linear-gradient(90deg,rgba(240,223,184,.025) 0px,rgba(240,223,184,.025) 1px,transparent 1px,transparent 22px),
-    radial-gradient(ellipse at 50% 30%,#1c1309,#0a0603);
+  border:2px solid rgba(181,113,43,.45);background:#100b06;
   box-shadow:inset 0 0 60px rgba(0,0,0,.6);overflow:hidden;touch-action:none;cursor:crosshair;}
 .scan-area svg{width:100%;height:100%;display:block;}
 .q-box{background:rgba(20,12,4,.5);border:1px solid rgba(181,113,43,.4);border-radius:12px;
   padding:16px 18px;margin-top:16px;display:flex;gap:14px;align-items:flex-start;}
-.q-box .q-icon{flex-shrink:0;width:44px;height:44px;border-radius:50%;background:rgba(20,12,4,.6);
+.q-box .q-icon{flex-shrink:0;width:44px;height:44px;border-radius:50%;background:#0d1620;
   border:1.5px solid rgba(181,113,43,.4);display:flex;align-items:center;justify-content:center;}
-.q-box .q-icon svg{width:30px;height:30px;overflow:visible;}
+.q-box .q-icon svg{width:32px;height:32px;overflow:visible;}
 .q-box .q-body{flex:1;min-width:0;}
 .q-box .q-label{font-family:'Cinzel',serif;font-weight:700;font-size:.78rem;letter-spacing:.06em;
   text-transform:uppercase;color:var(--ocre);margin-bottom:6px;}
@@ -50,17 +42,15 @@
 .choice.wrong{background:rgba(196,69,58,.15);border-color:var(--blood-light);color:#ffcaa0;}
 .choice.dis{pointer-events:none;}
 
-.reticle-ring{transform-box:fill-box;transform-origin:center;animation:spinRing 3.2s linear infinite;}
-@keyframes spinRing{to{transform:rotate(360deg);}}
-.injury-icon{pointer-events:none;}
-.injury-icon.revealed{animation:pulseInjury 1.15s ease-in-out infinite;}
-@keyframes pulseInjury{0%,100%{opacity:1;}50%{opacity:.55;}}
-.pulse-ring{animation:pulseRingAnim 1.5s ease-out infinite;transform-box:fill-box;transform-origin:center;}
-@keyframes pulseRingAnim{0%{transform:scale(.55);opacity:.85;}100%{transform:scale(2.1);opacity:0;}}
-.injury-icon.missed{opacity:.55 !important;}
-.ping-burst{pointer-events:none;fill:none;stroke-width:2;animation:pingBurst .65s ease-out forwards;}
-@keyframes pingBurst{from{r:3;opacity:1;}to{r:28;opacity:0;}}
-.trail-dot{pointer-events:none;}
+.lens-ring{pointer-events:none;}
+.lens-ring .ring-outer{animation:lensSpin 4s linear infinite;transform-box:fill-box;transform-origin:center;}
+@keyframes lensSpin{to{transform:rotate(360deg);}}
+.crack-mark{animation:crackPulse 1s ease-in-out infinite;transform-box:fill-box;transform-origin:center;}
+@keyframes crackPulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+.miss-x{pointer-events:none;animation:missFade .55s ease-out forwards;}
+@keyframes missFade{from{opacity:1;transform:scale(.7);}to{opacity:0;transform:scale(1.3);}}
+.found-flash{pointer-events:none;fill:none;stroke:#3ddc84;stroke-width:2;animation:foundPing .7s ease-out forwards;}
+@keyframes foundPing{from{r:4;opacity:1;}to{r:34;opacity:0;}}
 </style>
 </head>
 <body>
@@ -81,8 +71,8 @@
   <div id="intro">
     <div class="panel">
       <h2>Briefing</h2>
-      <p class="lead">Le <strong>Kaiseki no Jutsu</strong> permet de balayer le corps d'un patient avec son chakra pour révéler les blessures invisibles à l'œil nu — fractures, hémorragies internes, organes touchés.</p>
-      <p class="hint" style="margin-top:8px;">🖐 Fais glisser ton curseur sur le corps pour faire circuler ton chakra. Maintiens-le sur une zone suspecte pour la révéler nettement, puis diagnostique chaque blessure trouvée avant la fin du chrono.</p>
+      <p class="lead">Le <strong>Kaiseki no Jutsu</strong> transforme ton chakra en un véritable scanner. Passe ta main au-dessus du corps du patient : la zone sous ton chakra devient transparente et révèle le squelette en dessous.</p>
+      <p class="hint" style="margin-top:8px;">🖐 Balaie tout le corps pour chercher l'os cassé à travers ta fenêtre de chakra, puis clique dessus dès que tu le vois pour confirmer le diagnostic — avant la fin du chrono.</p>
     </div>
     <div class="panel">
       <h2>Identification</h2>
@@ -99,18 +89,18 @@
   <div id="game" style="display:none;">
     <div class="panel">
       <div class="case-hd">
-        <span class="case-label" id="phaseTag">Phase de scan</span>
+        <span class="case-label" id="phaseTag">Scan aux rayons chakra</span>
         <span class="case-count" id="caseCount">Cas 1/5</span>
       </div>
       <div class="patient-line" id="patientLine"></div>
 
       <div id="scanPhase">
-        <div class="found-tally" id="foundTally">0 / 0 blessure(s) détectée(s)</div>
+        <div class="status-line" id="statusLine">Cherche la fracture...</div>
         <div class="timer-track"><div class="timer-fill" id="scanTimerFill"></div></div>
         <div class="scan-area" id="scanArea">
           <svg id="bodySvg" viewBox="0 0 160 340" xmlns="http://www.w3.org/2000/svg"></svg>
         </div>
-        <div class="instr">Balaie lentement tout le corps avec ton curseur pour faire réagir ton chakra sur les zones abîmées.</div>
+        <div class="instr">Passe ton curseur sur le corps pour ouvrir la fenêtre de chakra, repère l'os cassé, puis clique dessus.</div>
       </div>
 
       <div id="diagPhase" style="display:none;">
@@ -119,7 +109,7 @@
           <div class="q-icon" id="diagIcon"></div>
           <div class="q-body">
             <div class="q-label" id="diagZoneLbl">Zone</div>
-            <div class="q-text" id="diagQ">Quel est le problème détecté ici ?</div>
+            <div class="q-text" id="diagQ">Quel os est fracturé ici ?</div>
             <div id="diagChoices"></div>
           </div>
         </div>
@@ -149,157 +139,132 @@
 var el=function(id){return document.getElementById(id);};
 var SVG_NS='http://www.w3.org/2000/svg';
 
-var POOL=["Fracture costale","Hématome hépatique","Fracture du poignet","Hémorragie interne",
-  "Contusion pulmonaire","Traumatisme crânien léger","Fracture de la clavicule","Perforation intestinale",
-  "Fracture du tibia","Entorse de cheville","Contusion rénale","Déchirure musculaire"];
-
-var TYPE_OF={
-  "Fracture costale":"os","Fracture du poignet":"os","Fracture de la clavicule":"os","Fracture du tibia":"os",
-  "Hématome hépatique":"interne","Hémorragie interne":"interne","Perforation intestinale":"interne",
-  "Contusion rénale":"interne","Traumatisme crânien léger":"interne","Contusion pulmonaire":"interne",
-  "Entorse de cheville":"tissu","Déchirure musculaire":"tissu"
-};
-
 var CASES=[
-  {name:"Patient — chute d'un toit",injuries:[
-    {q:"Zone thoracique droite",cx:95,cy:113,r:14,ans:"Fracture costale"},
-    {q:"Zone abdominale droite",cx:98,cy:152,r:14,ans:"Hématome hépatique"},
-    {q:"Avant-bras droit",cx:132,cy:160,r:11,ans:"Fracture du poignet"}
-  ]},
-  {name:"Patient — combat rapproché",injuries:[
-    {q:"Zone abdominale gauche",cx:60,cy:150,r:14,ans:"Hémorragie interne"},
-    {q:"Zone thoracique gauche",cx:65,cy:112,r:14,ans:"Contusion pulmonaire"},
-    {q:"Zone crânienne",cx:80,cy:26,r:14,ans:"Traumatisme crânien léger"}
-  ]},
-  {name:"Patient — explosion de sable",injuries:[
-    {q:"Épaule droite",cx:112,cy:96,r:11,ans:"Fracture de la clavicule"},
-    {q:"Zone abdominale centrale",cx:80,cy:158,r:14,ans:"Perforation intestinale"},
-    {q:"Jambe gauche",cx:54,cy:270,r:11,ans:"Fracture du tibia"}
-  ]},
-  {name:"Patient — chute dans un ravin",injuries:[
-    {q:"Cheville droite",cx:108,cy:295,r:11,ans:"Entorse de cheville"},
-    {q:"Flanc droit",cx:100,cy:158,r:14,ans:"Contusion rénale"},
-    {q:"Cuisse gauche",cx:56,cy:240,r:12,ans:"Déchirure musculaire"}
-  ]},
-  {name:"Patient — écrasé sous des décombres",injuries:[
-    {q:"Zone thoracique",cx:80,cy:113,r:15,ans:"Fracture costale"},
-    {q:"Zone abdominale",cx:70,cy:152,r:14,ans:"Hémorragie interne"},
-    {q:"Jambe droite",cx:106,cy:270,r:11,ans:"Fracture du tibia"}
-  ]}
+  {name:"Patient — chute d'un toit",q:"Cage thoracique droite",cx:97,cy:112,ans:"Fracture costale",part:"rib"},
+  {name:"Patient — combat rapproché",q:"Crâne",cx:80,cy:24,ans:"Fracture du crâne",part:"skull"},
+  {name:"Patient — explosion de sable",q:"Clavicule droite",cx:104,cy:66,ans:"Fracture de la clavicule",part:"clavicle"},
+  {name:"Patient — chute dans un ravin",q:"Tibia droit",cx:104,cy:255,ans:"Fracture du tibia",part:"leg"},
+  {name:"Patient — écrasé sous des décombres",q:"Poignet gauche",cx:24,cy:158,ans:"Fracture du poignet",part:"arm"}
 ];
+var POOL=CASES.map(function(c){return c.ans;});
 
-var REVEAL_MS=1000, SCAN_RADIUS=24, SCAN_SECONDS=18, DIAG_SECONDS=7, TRAIL_LEN=7;
+var LENS_R=26, SCAN_SECONDS=16, DIAG_SECONDS=7, HIT_TOL=15;
 
 var idx=0,playerName='',caseResults=[];
-var injuries=[],revealedOrder=[],foundCount=0,mousePt=null,animId=null,lastT=0,scanActive=false;
+var lensPt=null,scanActive=false,found=false;
 var scanTimerHandle=null,scanTimerInterval=null,diagTimerHandle=null,diagTimerInterval=null;
-var diagIdx=0,diagCorrect=0,diagAnswered=false;
-var trailBuf=[],trailEls=[];
+var diagAnswered=false;
 
 function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
 
-/* ---------- icon markup by injury type ---------- */
-function iconMarkup(type){
-  if(type==='os'){
-    return '<ellipse cx="-9" cy="0" rx="5.5" ry="4.5" fill="#efe3c4" stroke="#8a4f1a" stroke-width="1"/>'+
-      '<ellipse cx="9" cy="0" rx="5.5" ry="4.5" fill="#efe3c4" stroke="#8a4f1a" stroke-width="1"/>'+
-      '<rect x="-9" y="-3.4" width="18" height="6.8" fill="#efe3c4" stroke="#8a4f1a" stroke-width="1"/>'+
-      '<path d="M-4 -4.5 L0 -0.5 L-3 1.5 L2 5" stroke="#9a2820" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
-  }
-  if(type==='interne'){
-    return '<circle r="11" fill="rgba(154,40,32,.5)"/>'+
-      '<circle class="pulse-ring" r="11" fill="none" stroke="rgba(196,69,58,.7)" stroke-width="1.6"/>'+
-      '<circle r="5.5" fill="rgba(220,80,65,.95)"/>';
-  }
-  return '<ellipse rx="12" ry="9" fill="rgba(91,74,138,.5)"/>'+
-    '<ellipse rx="6.5" ry="5" fill="rgba(58,42,102,.6)" cx="-2" cy="1.5"/>'+
-    '<ellipse rx="4" ry="3" fill="rgba(150,130,200,.4)" cx="3" cy="-2.5"/>';
+/* ---------- capsule (filled rounded bar) between two points ---------- */
+function capsulePath(x1,y1,x2,y2,w){
+  var dx=x2-x1,dy=y2-y1,len=Math.sqrt(dx*dx+dy*dy)||1;
+  var ux=dx/len,uy=dy/len,px=-uy*w,py=ux*w;
+  return 'M'+(x1+px)+' '+(y1+py)+
+    ' L'+(x2+px)+' '+(y2+py)+
+    ' A'+w+' '+w+' 0 0 1 '+(x2-px)+' '+(y2-py)+
+    ' L'+(x1-px)+' '+(y1-py)+
+    ' A'+w+' '+w+' 0 0 1 '+(x1+px)+' '+(y1+py)+' Z';
+}
+function mkPath(d,fill,stroke,sw){
+  var p=document.createElementNS(SVG_NS,'path');
+  p.setAttribute('d',d); p.setAttribute('fill',fill||'none');
+  if(stroke){p.setAttribute('stroke',stroke);p.setAttribute('stroke-width',sw||1);}
+  return p;
 }
 
-function buildInjuryGroup(type){
-  var g=document.createElementNS(SVG_NS,'g');
-  g.setAttribute('class','injury-icon type-'+type);
-  g.style.opacity='0';
-  g.innerHTML=iconMarkup(type);
-  return g;
-}
+var LIMBS=[
+  ['leftLeg',62,182,50,300,8],['rightLeg',98,182,108,300,8],
+  ['leftArm',52,68,20,168,7],['rightArm',108,68,140,168,7]
+];
+var TORSO_D='M46 64 Q80 48 114 64 L122 128 Q122 178 106 192 Q80 202 54 192 Q38 178 38 128 Z';
 
-/* ---------- body (training dummy) ---------- */
 function buildBody(){
   var svg=el('bodySvg');
   svg.innerHTML='';
+
   var defs=document.createElementNS(SVG_NS,'defs');
   defs.innerHTML=
-    '<radialGradient id="bodyGrad" cx="45%" cy="25%" r="80%">'+
-      '<stop offset="0%" stop-color="#5a4326"/>'+
-      '<stop offset="100%" stop-color="#382712"/>'+
-    '</radialGradient>';
+    '<radialGradient id="skinGrad" cx="45%" cy="25%" r="80%">'+
+      '<stop offset="0%" stop-color="#5a4326"/><stop offset="100%" stop-color="#382712"/>'+
+    '</radialGradient>'+
+    '<radialGradient id="lensGrad" cx="50%" cy="50%" r="50%">'+
+      '<stop offset="0%" stop-color="black"/><stop offset="62%" stop-color="black"/>'+
+      '<stop offset="100%" stop-color="white"/>'+
+    '</radialGradient>'+
+    '<clipPath id="bodyClip">'+
+      '<circle cx="80" cy="30" r="20"/>'+
+      '<path d="'+TORSO_D+'"/>'+
+      LIMBS.map(function(l){return '<path d="'+capsulePath(l[1],l[2],l[3],l[4],l[5])+'"/>';}).join('')+
+    '</clipPath>'+
+    '<mask id="scanMask"><rect x="0" y="0" width="160" height="340" fill="white"/>'+
+      '<circle id="maskHole" cx="-100" cy="-100" r="'+(LENS_R*1.35)+'" fill="url(#lensGrad)"/>'+
+    '</mask>';
   svg.appendChild(defs);
 
-  function limb(d,w){var p=document.createElementNS(SVG_NS,'path');p.setAttribute('d',d);
-    p.setAttribute('stroke','url(#bodyGrad)');p.setAttribute('stroke-width',w);
-    p.setAttribute('stroke-linecap','round');p.setAttribute('stroke-linejoin','round');
-    p.setAttribute('fill','none');svg.appendChild(p);}
-  function shape(d,fill,stroke,sw){var p=document.createElementNS(SVG_NS,'path');p.setAttribute('d',d);
-    p.setAttribute('fill',fill||'none');p.setAttribute('stroke',stroke||'none');
-    if(sw)p.setAttribute('stroke-width',sw);svg.appendChild(p);}
-  function bone(x1,y1,x2,y2,curve){
-    var d=curve?('M'+x1+' '+y1+' Q'+curve.x+' '+curve.y+' '+x2+' '+y2):('M'+x1+' '+y1+' L'+x2+' '+y2);
-    var p=document.createElementNS(SVG_NS,'path');p.setAttribute('d',d);
-    p.setAttribute('stroke','rgba(240,223,184,.16)');p.setAttribute('stroke-width','2');
-    p.setAttribute('fill','none');svg.appendChild(p);
-  }
+  /* ---- X-RAY LAYER (clipped to body silhouette) ---- */
+  var xray=document.createElementNS(SVG_NS,'g');
+  xray.setAttribute('id','xrayLayer');
+  xray.setAttribute('clip-path','url(#bodyClip)');
+  xray.appendChild(mkPath('M0 0 H160 V340 H0 Z','#0a1420'));
 
-  /* legs */
-  limb('M62 182 L54 240 L50 300',15);
-  limb('M98 182 L104 240 L108 300',15);
-  shape('M43 296 q7 -5 14 0 l1 10 q-8 4 -16 0 z','#382712');
-  shape('M101 296 q7 -5 14 0 l1 10 q-8 4 -16 0 z','#382712');
+  function bone(d,w){ var p=mkPath(d,'none','#d7e6ef',w); p.setAttribute('stroke-linecap','round'); xray.appendChild(p); }
+  function boneFill(d,fill){ xray.appendChild(mkPath(d,fill||'#d7e6ef')); }
 
-  /* arms */
-  limb('M52 70 L28 112 L20 168',14);
-  limb('M108 70 L132 112 L140 168',14);
+  boneFill('M80 30 m-15 0 a15 15 0 1 0 30 0 a15 15 0 1 0 -30 0','none');
+  bone('M80 30 m-15 0 a15 15 0 1 0 30 0 a15 15 0 1 0 -30 0',1.6);
+  boneFill('M69 33 a3 4 0 1 0 6 0 a3 4 0 1 0 -6 0','#0a1420');
+  boneFill('M85 33 a3 4 0 1 0 6 0 a3 4 0 1 0 -6 0','#0a1420');
+  bone('M70 42 Q80 47 90 42',1.4);
 
-  /* torso */
-  shape('M46 64 Q80 48 114 64 L122 128 Q122 178 106 192 Q80 202 54 192 Q38 178 38 128 Z','url(#bodyGrad)','rgba(181,113,43,.5)',2);
+  for(var i=0;i<9;i++){ boneFill(capsulePath(80,58+i*14,80,58+i*14+9,3.6),'#d7e6ef'); }
+  bone('M64 66 Q46 68 42 72',3);
+  bone('M96 66 Q114 68 118 72',3);
+  [ -1,1 ].forEach(function(side){
+    for(var r=0;r<4;r++){
+      var yy=88+r*15;
+      var x1=80, x2=80+side*40, ymid=yy+6+side*0;
+      bone('M'+x1+' '+yy+' Q'+(80+side*32)+' '+(yy+8)+' '+x2+' '+(yy+16),2.4);
+    }
+  });
+  boneFill('M50 178 Q80 196 110 178 L104 196 Q80 208 56 196 Z','#d7e6ef');
 
-  /* head + neck */
-  limb('M80 50 L80 62',13);
-  shape('M80 30 m-20 0 a20 20 0 1 0 40 0 a20 20 0 1 0 -40 0','url(#bodyGrad)','rgba(181,113,43,.5)',2);
+  boneFill(capsulePath(52,68,34,118,5),'#d7e6ef');
+  boneFill(capsulePath(34,118,20,168,4.2),'#d7e6ef');
+  boneFill(capsulePath(108,68,126,118,5),'#d7e6ef');
+  boneFill(capsulePath(126,118,140,168,4.2),'#d7e6ef');
+  boneFill(capsulePath(62,182,56,240,6.2),'#d7e6ef');
+  boneFill(capsulePath(56,240,50,300,5),'#d7e6ef');
+  boneFill(capsulePath(98,182,104,240,6.2),'#d7e6ef');
+  boneFill(capsulePath(104,240,108,300,5),'#d7e6ef');
 
-  /* faint skeletal guide lines (chakra x-ray hint) */
-  bone(80,58,80,190);
-  bone(58,90,102,90,{x:80,y:84});
-  bone(56,110,104,110,{x:80,y:104});
-  bone(58,130,102,130,{x:80,y:124});
-  bone(80,20,80,20);
+  svg.appendChild(xray);
+  window.__xrayLayer=xray;
 
-  /* chakra scan reticle */
-  var g=document.createElementNS(SVG_NS,'g');
-  g.setAttribute('id','scanReticleGroup');
-  g.style.display='none';
-  g.innerHTML=
-    '<circle r="'+SCAN_RADIUS+'" fill="rgba(111,207,151,.12)"/>'+
-    '<circle class="reticle-ring" r="'+SCAN_RADIUS+'" fill="none" stroke="rgba(61,220,132,.6)" stroke-width="1.4" stroke-dasharray="4 5"/>'+
-    '<circle r="2.6" fill="rgba(61,220,132,.95)"/>';
-  svg.appendChild(g);
+  /* ---- SKIN LAYER (masked, opaque) ---- */
+  var skin=document.createElementNS(SVG_NS,'g');
+  skin.setAttribute('id','skinLayer');
+  skin.setAttribute('mask','url(#scanMask)');
+  var head=document.createElementNS(SVG_NS,'circle');
+  head.setAttribute('cx',80);head.setAttribute('cy',30);head.setAttribute('r',20);
+  head.setAttribute('fill','url(#skinGrad)');head.setAttribute('stroke','rgba(181,113,43,.5)');head.setAttribute('stroke-width',2);
+  skin.appendChild(head);
+  skin.appendChild(mkPath(TORSO_D,'url(#skinGrad)','rgba(181,113,43,.5)',2));
+  LIMBS.forEach(function(l){
+    skin.appendChild(mkPath(capsulePath(l[1],l[2],l[3],l[4],l[5]),'url(#skinGrad)','rgba(181,113,43,.4)',1.5));
+  });
+  svg.appendChild(skin);
 
-  var trailG=document.createElementNS(SVG_NS,'g');
-  trailG.setAttribute('id','trailGroup');
-  svg.appendChild(trailG);
-  trailEls=[];
-  for(var i=0;i<TRAIL_LEN;i++){
-    var c=document.createElementNS(SVG_NS,'circle');
-    c.setAttribute('class','trail-dot');
-    c.setAttribute('r','0');
-    c.setAttribute('fill','rgba(111,207,151,.5)');
-    trailG.appendChild(c);
-    trailEls.push(c);
-  }
-
-  var injuryG=document.createElementNS(SVG_NS,'g');
-  injuryG.setAttribute('id','injuryGroup');
-  svg.appendChild(injuryG);
+  /* ---- lens ring (always visible, follows cursor) ---- */
+  var lens=document.createElementNS(SVG_NS,'g');
+  lens.setAttribute('id','lensRing');
+  lens.setAttribute('class','lens-ring');
+  lens.style.display='none';
+  lens.innerHTML=
+    '<circle r="'+LENS_R+'" fill="none" stroke="rgba(61,220,132,.55)" stroke-width="1.6" class="ring-outer" stroke-dasharray="5 6"/>'+
+    '<circle r="2.4" fill="rgba(61,220,132,.9)"/>';
+  svg.appendChild(lens);
 }
 
 function startGame(){
@@ -315,64 +280,44 @@ function startGame(){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
+var currentCrackEl=null;
+
 function loadCase(){
   var c=CASES[idx];
   el('caseCount').textContent='Cas '+(idx+1)+'/'+CASES.length;
   el('patientLine').textContent=c.name;
-  el('phaseTag').textContent='Phase de scan';
+  el('phaseTag').textContent='Scan aux rayons chakra';
   el('scanPhase').style.display='';
   el('diagPhase').style.display='none';
   el('feedback').className='feedback';el('feedback').textContent='';
+  el('statusLine').className='status-line';
+  el('statusLine').textContent='Cherche la fracture...';
 
-  injuries=c.injuries.map(function(inj){
-    return {q:inj.q,cx:inj.cx,cy:inj.cy,r:inj.r,ans:inj.ans,type:TYPE_OF[inj.ans]||'tissu',progress:0,revealed:false,el:null};
-  });
-  revealedOrder=[];foundCount=0;
-  el('foundTally').textContent='0 / '+injuries.length+' blessure(s) détectée(s)';
+  var hole=el('maskHole');
+  if(hole){hole.setAttribute('r',LENS_R*1.35);hole.setAttribute('cx',-100);hole.setAttribute('cy',-100);}
+  lensPt=null;
+  var ring=el('lensRing'); if(ring)ring.style.display='none';
 
-  var injuryG=el('injuryGroup');
-  injuryG.innerHTML='';
-  injuries.forEach(function(inj){
-    var g=buildInjuryGroup(inj.type);
-    g.setAttribute('transform','translate('+inj.cx+','+inj.cy+')');
-    injuryG.appendChild(g);
-    inj.el=g;
-  });
+  if(currentCrackEl && currentCrackEl.parentNode) currentCrackEl.parentNode.removeChild(currentCrackEl);
+  var g=document.createElementNS(SVG_NS,'g');
+  g.setAttribute('class','crack-mark');
+  g.setAttribute('transform','translate('+c.cx+','+c.cy+')');
+  g.innerHTML='<path d="M-7 -8 L-1 -1 L-6 3 L2 6 L-2 13" stroke="#ff6b4a" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'+
+    '<path d="M-7 -8 L-1 -1 L-6 3 L2 6 L-2 13" stroke="#ff6b4a" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".25"/>';
+  window.__xrayLayer.appendChild(g);
+  currentCrackEl=g;
 
+  found=false;
   scanActive=true;
-  trailBuf=[];
-  lastT=performance.now();
-  if(animId)cancelAnimationFrame(animId);
-  animId=requestAnimationFrame(scanLoop);
-
   runScanTimer(SCAN_SECONDS,function(){
     scanActive=false;
-    revealMissed();
+    onTimeout(c);
   });
-}
-
-function revealMissed(){
-  var any=false;
-  injuries.forEach(function(inj){
-    if(!inj.revealed){
-      any=true;
-      inj.el.classList.add('missed');
-      inj.el.style.opacity='1';
-    }
-  });
-  if(any){
-    var fb=el('feedback');
-    fb.className='feedback no';
-    fb.textContent='⏱ Temps écoulé — les zones non détectées apparaissent en surbrillance.';
-    setTimeout(startDiagPhase,1100);
-  } else {
-    startDiagPhase();
-  }
 }
 
 function bindScanEvents(){
   var svg=el('bodySvg');
-  function point(e){
+  function svgPoint(e){
     var cx=(e.touches&&e.touches[0])?e.touches[0].clientX:e.clientX;
     var cy=(e.touches&&e.touches[0])?e.touches[0].clientY:e.clientY;
     var pt=svg.createSVGPoint();
@@ -384,82 +329,72 @@ function bindScanEvents(){
   }
   function move(e){
     if(!scanActive)return;
-    var p=point(e);
+    var p=svgPoint(e);
     if(!p)return;
-    mousePt=p;
-    var ret=el('scanReticleGroup');
-    if(ret){ret.style.display='';ret.setAttribute('transform','translate('+p.x+','+p.y+')');}
+    lensPt=p;
+    var hole=el('maskHole');
+    if(hole){hole.setAttribute('cx',p.x);hole.setAttribute('cy',p.y);}
+    var ring=el('lensRing');
+    if(ring){ring.style.display='';ring.setAttribute('transform','translate('+p.x+','+p.y+')');}
     e.preventDefault();
   }
-  function leave(){ mousePt=null; var ret=el('scanReticleGroup'); if(ret)ret.style.display='none'; }
+  function leave(){
+    lensPt=null;
+    var hole=el('maskHole'); if(hole){hole.setAttribute('cx',-100);hole.setAttribute('cy',-100);}
+    var ring=el('lensRing'); if(ring)ring.style.display='none';
+  }
+  function click(e){
+    if(!scanActive || found)return;
+    var p=svgPoint(e);
+    if(!p)return;
+    var c=CASES[idx];
+    var dx=p.x-c.cx, dy=p.y-c.cy;
+    var dist=Math.sqrt(dx*dx+dy*dy);
+    if(dist<=HIT_TOL){ onFound(c); }
+    else { spawnMiss(p.x,p.y); }
+  }
   svg.addEventListener('mousemove',move);
   svg.addEventListener('touchmove',move,{passive:false});
   svg.addEventListener('mouseleave',leave);
   svg.addEventListener('touchend',leave);
+  svg.addEventListener('click',click);
 }
 
-function spawnPing(cx,cy,color){
+function spawnMiss(x,y){
+  var svg=el('bodySvg');
+  var g=document.createElementNS(SVG_NS,'g');
+  g.setAttribute('class','miss-x');
+  g.setAttribute('transform','translate('+x+','+y+')');
+  g.innerHTML='<line x1="-7" y1="-7" x2="7" y2="7" stroke="#c4453a" stroke-width="2.4" stroke-linecap="round"/>'+
+    '<line x1="7" y1="-7" x2="-7" y2="7" stroke="#c4453a" stroke-width="2.4" stroke-linecap="round"/>';
+  svg.appendChild(g);
+  setTimeout(function(){ if(g.parentNode)g.parentNode.removeChild(g); },600);
+}
+
+function spawnFoundRing(cx,cy){
   var svg=el('bodySvg');
   var c=document.createElementNS(SVG_NS,'circle');
-  c.setAttribute('cx',cx);c.setAttribute('cy',cy);c.setAttribute('r','3');
-  c.setAttribute('class','ping-burst');
-  c.setAttribute('stroke',color);
+  c.setAttribute('cx',cx);c.setAttribute('cy',cy);c.setAttribute('r','4');
+  c.setAttribute('class','found-flash');
   svg.appendChild(c);
-  setTimeout(function(){ if(c.parentNode) c.parentNode.removeChild(c); },700);
+  setTimeout(function(){ if(c.parentNode)c.parentNode.removeChild(c); },750);
 }
 
-function updateTrail(){
-  var track=el('trailGroup');
-  if(!track)return;
-  if(scanActive && mousePt){
-    trailBuf.unshift({x:mousePt.x,y:mousePt.y});
-    if(trailBuf.length>TRAIL_LEN) trailBuf.length=TRAIL_LEN;
-  } else {
-    trailBuf=[];
-  }
-  for(var i=0;i<TRAIL_LEN;i++){
-    var c=trailEls[i];
-    var p=trailBuf[i];
-    if(p){
-      c.setAttribute('cx',p.x);c.setAttribute('cy',p.y);
-      c.setAttribute('r',((TRAIL_LEN-i)/TRAIL_LEN*6).toFixed(1));
-      c.setAttribute('opacity',(1-i/TRAIL_LEN)*0.4);
-    } else {
-      c.setAttribute('r','0');
-    }
-  }
+function onFound(c){
+  found=true; scanActive=false; clearScanTimer();
+  spawnFoundRing(c.cx,c.cy);
+  el('statusLine').className='status-line ok';
+  el('statusLine').textContent='✔ Fracture localisée !';
+  var hole=el('maskHole'); if(hole){hole.setAttribute('r',200);}
+  setTimeout(function(){ startDiag(c,true); },900);
 }
 
-function scanLoop(t){
-  var dt=t-lastT; lastT=t;
-  updateTrail();
-  if(scanActive && mousePt){
-    injuries.forEach(function(inj){
-      if(inj.revealed)return;
-      var dx=mousePt.x-inj.cx, dy=mousePt.y-inj.cy;
-      var dist=Math.sqrt(dx*dx+dy*dy);
-      if(dist<=SCAN_RADIUS+inj.r){
-        inj.progress=Math.min(REVEAL_MS,inj.progress+dt);
-        var ratio=inj.progress/REVEAL_MS;
-        inj.el.style.opacity=ratio.toFixed(2);
-        if(inj.progress>=REVEAL_MS && !inj.revealed){
-          inj.revealed=true;
-          inj.el.classList.add('revealed');
-          var col=inj.type==='os'?'#c4453a':(inj.type==='interne'?'#c4453a':'#8c78c2');
-          spawnPing(inj.cx,inj.cy,col);
-          revealedOrder.push(inj);
-          foundCount++;
-          el('foundTally').textContent=foundCount+' / '+injuries.length+' blessure(s) détectée(s)';
-          if(foundCount>=injuries.length){
-            scanActive=false;
-            clearScanTimer();
-            setTimeout(startDiagPhase,500);
-          }
-        }
-      }
-    });
-  }
-  if(scanActive) animId=requestAnimationFrame(scanLoop);
+function onTimeout(c){
+  el('statusLine').className='status-line no';
+  el('statusLine').textContent='⏱ Temps écoulé — voici la zone exacte.';
+  var hole=el('maskHole'); if(hole){hole.setAttribute('r',200);}
+  var ring=el('lensRing'); if(ring)ring.style.display='none';
+  setTimeout(function(){ startDiag(c,false); },1300);
 }
 
 function runScanTimer(seconds,onExpire){
@@ -479,37 +414,37 @@ function runScanTimer(seconds,onExpire){
 }
 function clearScanTimer(){if(scanTimerHandle)clearTimeout(scanTimerHandle);if(scanTimerInterval)clearInterval(scanTimerInterval);}
 
-function startDiagPhase(){
-  if(animId)cancelAnimationFrame(animId);
-  el('phaseTag').textContent='Phase de diagnostic';
+var caseFoundFlag=false;
+function startDiag(c,wasFound){
+  caseFoundFlag=wasFound;
+  if(!wasFound){
+    caseResults.push({name:c.name,found:0,diagCorrect:0});
+    idx++;
+    if(idx>=CASES.length){ finish(); return; }
+    loadCase();
+    return;
+  }
+  el('phaseTag').textContent='Diagnostic';
   el('scanPhase').style.display='none';
   el('diagPhase').style.display='';
-  diagIdx=0;diagCorrect=0;
-  loadDiagQuestion();
-}
-
-function loadDiagQuestion(){
-  if(diagIdx>=revealedOrder.length){ finishCaseDiag(); return; }
-  var inj=revealedOrder[diagIdx];
-  diagAnswered=false;
-  el('diagZoneLbl').textContent=inj.q;
-  el('diagQ').textContent='Quel est le problème détecté ici ?';
   el('feedback').className='feedback';el('feedback').textContent='';
-  var iconBox=el('diagIcon');
-  iconBox.innerHTML='<svg viewBox="-15 -15 30 30">'+iconMarkup(inj.type)+'</svg>';
+  diagAnswered=false;
+  el('diagZoneLbl').textContent=c.q;
+  el('diagQ').textContent='Quel os est fracturé ici ?';
+  el('diagIcon').innerHTML='<svg viewBox="-15 -15 30 30"><path d="M-7 -8 L-1 -1 L-6 3 L2 6 L-2 13" stroke="#ff6b4a" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
-  var distractPool=POOL.filter(function(p){return p!==inj.ans;});
+  var distractPool=POOL.filter(function(p){return p!==c.ans;});
   var picks=shuffle(distractPool).slice(0,2);
-  var opts=shuffle([inj.ans].concat(picks));
+  var opts=shuffle([c.ans].concat(picks));
 
   var box=el('diagChoices'); box.innerHTML='';
   opts.forEach(function(o){
     var btn=document.createElement('button');
     btn.className='choice'; btn.textContent=o;
-    btn.addEventListener('click',function(){ if(!diagAnswered) onDiagAnswer(o,inj); });
+    btn.addEventListener('click',function(){ if(!diagAnswered) onDiagAnswer(o,c); });
     box.appendChild(btn);
   });
-  runDiagTimer(DIAG_SECONDS,function(){ if(!diagAnswered) onDiagAnswer(null,inj); });
+  runDiagTimer(DIAG_SECONDS,function(){ if(!diagAnswered) onDiagAnswer(null,c); });
 }
 
 function runDiagTimer(seconds,onExpire){
@@ -523,39 +458,30 @@ function runDiagTimer(seconds,onExpire){
 }
 function clearDiagTimer(){if(diagTimerHandle)clearTimeout(diagTimerHandle);if(diagTimerInterval)clearInterval(diagTimerInterval);}
 
-function onDiagAnswer(chosen,inj){
+function onDiagAnswer(chosen,c){
   diagAnswered=true; clearDiagTimer();
-  var ok=chosen===inj.ans;
-  if(ok)diagCorrect++;
-  inj.diagCorrect=ok;
+  var ok=chosen===c.ans;
   var btns=el('diagChoices').children;
   for(var i=0;i<btns.length;i++){
     var b=btns[i]; b.classList.add('dis');
-    if(b.textContent===inj.ans)b.classList.add('correct');
+    if(b.textContent===c.ans)b.classList.add('correct');
     else if(b.textContent===chosen)b.classList.add('wrong');
   }
   var fb=el('feedback');
   fb.className='feedback '+(ok?'ok':'no');
   fb.textContent=ok?'✔ Diagnostic correct.':(chosen?'✘ Mauvais diagnostic.':'✘ Trop lent — diagnostic non posé.');
-  setTimeout(function(){ diagIdx++; loadDiagQuestion(); },1200);
-}
-
-function finishCaseDiag(){
-  caseResults.push({
-    name:CASES[idx].name,
-    total:injuries.length,
-    found:foundCount,
-    diagCorrect:diagCorrect
-  });
-  idx++;
-  if(idx>=CASES.length){ finish(); return; }
-  loadCase();
+  caseResults.push({name:c.name,found:1,diagCorrect:ok?1:0});
+  setTimeout(function(){
+    idx++;
+    if(idx>=CASES.length){ finish(); return; }
+    loadCase();
+  },1300);
 }
 
 function finish(){
-  var totalInjuries=0,totalFound=0,totalDiag=0;
-  caseResults.forEach(function(r){ totalInjuries+=r.total; totalFound+=r.found; totalDiag+=r.diagCorrect; });
-  var denom=totalInjuries*2;
+  var totalCases=CASES.length,totalFound=0,totalDiag=0;
+  caseResults.forEach(function(r){ totalFound+=r.found; totalDiag+=r.diagCorrect; });
+  var denom=totalCases*2;
   var num=totalFound+totalDiag;
   var pct=denom?Math.round(num/denom*100):0;
   var g=gradeFor(pct);
@@ -564,7 +490,8 @@ function finish(){
   var box=el('reportBox'); box.innerHTML='';
   addRow(box,'Apprenti',playerName);
   caseResults.forEach(function(r){
-    addRow(box,r.name,r.found+'/'+r.total+' trouvées · '+r.diagCorrect+'/'+r.total+' diagnostiquées');
+    var v=r.found?(r.diagCorrect?'✓ trouvée + bon diagnostic':'✓ trouvée, mauvais diagnostic'):'✗ non trouvée';
+    addRow(box,r.name,v);
   });
   addRow(box,'SCORE',num+' / '+denom);
   save({name:playerName,correct:num,total:denom,score:pct,grade:g.l});
@@ -576,9 +503,9 @@ function addRow(p,k,v){var d=document.createElement('div');d.className='rrow';
   d.innerHTML='<span class="k">'+k+'</span><span class="v">'+v+'</span>';p.appendChild(d);}
 
 function gradeFor(s){
-  if(s>=90)return {l:"S",cls:"s",txt:"Diagnostic chakra irréprochable, aucune blessure cachée n'a échappé au scan."};
-  if(s>=60)return {l:"B",cls:"b",txt:"Bon niveau, quelques zones mal scannées ou mal diagnostiquées."};
-  return {l:"D",cls:"f",txt:"Trop de blessures manquées ou mal identifiées. Revois la technique de diagnostic."};
+  if(s>=90)return {l:"S",cls:"s",txt:"Scan chakra parfait, chaque fracture repérée et identifiée sans hésiter."};
+  if(s>=60)return {l:"B",cls:"b",txt:"Bon niveau, quelques fractures manquées ou mal identifiées."};
+  return {l:"D",cls:"f",txt:"Trop de fractures manquées. Balaie plus lentement tout le corps la prochaine fois."};
 }
 
 function save(row){
