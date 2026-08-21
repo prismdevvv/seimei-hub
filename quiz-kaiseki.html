@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seimei — Simulation Kaiseki no Jutsu | Sunagakure</title>
+<script src="vendor/supabase.js"></script>
+<script src="config.js"></script>
+<link rel="stylesheet" href="shared.css">
+<style>
+.metric-bar{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:.95rem;
+  margin-bottom:10px;color:var(--sand-deep);}
+.metric-bar .val{font-family:'Cinzel',serif;font-weight:700;color:var(--sand-1);}
+.metric-bar .val.good{color:var(--chakra-glow);}
+.metric-bar .val.bad{color:var(--blood-light);}
+.metric-bar .val.warn{color:var(--gold);}
+.case-hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;flex-wrap:wrap;gap:6px;}
+.case-label{font-family:'Cinzel',serif;font-weight:700;font-size:.78rem;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ocre);}
+.case-count{font-size:.85rem;color:var(--sand-deep);}
+.patient-line{font-size:1.08rem;color:var(--sand-1);font-weight:600;margin-bottom:10px;text-align:center;}
+.found-tally{font-family:'Cinzel',serif;font-weight:700;font-size:.9rem;color:var(--gold);text-align:center;margin-bottom:8px;}
+.timer-track{height:9px;border-radius:6px;background:rgba(20,12,4,.6);border:1px solid rgba(181,113,43,.35);overflow:hidden;margin-bottom:12px;}
+.timer-fill{height:100%;background:linear-gradient(90deg,var(--chakra),var(--gold));width:100%;}
+.timer-fill.danger{background:linear-gradient(90deg,var(--gold),var(--blood-light));}
+.scan-area{position:relative;width:100%;max-width:280px;height:420px;margin:0 auto;border-radius:14px;
+  border:2px solid rgba(181,113,43,.4);background:radial-gradient(ellipse at 50% 30%,#1a1108,#0d0904);
+  box-shadow:inset 0 0 50px rgba(0,0,0,.55);overflow:hidden;touch-action:none;cursor:crosshair;}
+.scan-area svg{width:100%;height:100%;display:block;}
+.q-box{background:rgba(20,12,4,.5);border:1px solid rgba(181,113,43,.4);border-radius:12px;
+  padding:16px 18px;margin-top:16px;}
+.q-box .q-label{font-family:'Cinzel',serif;font-weight:700;font-size:.78rem;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ocre);margin-bottom:6px;}
+.q-box .q-text{font-size:1.1rem;color:var(--sand-1);font-weight:600;margin-bottom:12px;}
+.choice{display:block;width:100%;text-align:left;padding:12px 16px;margin-bottom:8px;
+  font-family:inherit;font-size:1rem;color:var(--parchment);cursor:pointer;
+  background:rgba(20,12,4,.45);border:1.5px solid rgba(181,113,43,.35);
+  border-radius:10px;transition:.15s;}
+.choice:hover{background:rgba(181,113,43,.12);border-color:var(--ocre);}
+.choice.correct{background:rgba(61,220,132,.15);border-color:var(--chakra);color:var(--chakra-glow);}
+.choice.wrong{background:rgba(196,69,58,.15);border-color:var(--blood-light);color:#ffcaa0;}
+.choice.dis{pointer-events:none;}
+.revealed-mark{animation:pulseInjury 1.1s ease-in-out infinite;}
+@keyframes pulseInjury{0%,100%{stroke-opacity:1;}50%{stroke-opacity:.35;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="back-btn"><a href="techniques.html">← Retour au cours</a></div>
+  <header>
+    <div class="crest"><svg viewBox="0 0 100 100" fill="none">
+      <circle cx="50" cy="50" r="30" stroke="#b5712b" stroke-width="4"/>
+      <path d="M50 22 L58 44 L50 50 L42 44 Z" fill="#b5712b"/>
+      <path d="M50 78 L42 56 L50 50 L58 56 Z" fill="#b5712b"/>
+      <circle cx="50" cy="50" r="6" fill="#8a4f1a"/>
+    </svg></div>
+    <h1>Simulation Kaiseki no Jutsu</h1>
+    <div class="sub">Section Médicale — Seimei · Sunagakure</div>
+    <div class="divider"></div>
+  </header>
+
+  <div id="intro">
+    <div class="panel">
+      <h2>Briefing</h2>
+      <p class="lead">Le <strong>Kaiseki no Jutsu</strong> permet de balayer le corps d'un patient avec son chakra pour révéler les blessures invisibles à l'œil nu — hémorragies internes, fractures, organes touchés.</p>
+      <p class="hint" style="margin-top:8px;">🖐 Passe ton curseur sur le corps pour faire circuler ton chakra. Maintiens-le sur une zone suspecte pour la révéler, puis diagnostique chaque blessure trouvée avant la fin du chrono.</p>
+    </div>
+    <div class="panel">
+      <h2>Identification</h2>
+      <div class="field">
+        <label for="nameInput">Nom de shinobi</label>
+        <input type="text" id="nameInput" placeholder="Ex : Zipo Asakura" maxlength="28" autocomplete="off">
+      </div>
+      <div style="margin-top:16px;text-align:center;">
+        <button class="btn" id="startBtn">Commencer</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="game" style="display:none;">
+    <div class="panel">
+      <div class="case-hd">
+        <span class="case-label" id="phaseTag">Phase de scan</span>
+        <span class="case-count" id="caseCount">Cas 1/5</span>
+      </div>
+      <div class="patient-line" id="patientLine"></div>
+
+      <div id="scanPhase">
+        <div class="found-tally" id="foundTally">0 / 0 blessure(s) détectée(s)</div>
+        <div class="timer-track"><div class="timer-fill" id="scanTimerFill"></div></div>
+        <div class="scan-area" id="scanArea">
+          <svg id="bodySvg" viewBox="0 0 160 340" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+        <div class="instr">Balaie lentement tout le corps avec ton curseur pour faire réagir ton chakra sur les zones abîmées.</div>
+      </div>
+
+      <div id="diagPhase" style="display:none;">
+        <div class="timer-track"><div class="timer-fill" id="diagTimerFill"></div></div>
+        <div class="q-box">
+          <div class="q-label" id="diagZoneLbl">Zone</div>
+          <div class="q-text" id="diagQ">Quel est le problème détecté ici ?</div>
+          <div id="diagChoices"></div>
+        </div>
+      </div>
+
+      <div class="feedback" id="feedback"></div>
+    </div>
+  </div>
+
+  <div id="result">
+    <div class="panel">
+      <h2>Rapport d'évaluation</h2>
+      <div class="grade" id="gradeLetter">—</div>
+      <div class="verdict" id="verdict"></div>
+      <div id="reportBox" style="background:rgba(20,12,4,.55);border:1px dashed var(--ocre);border-radius:12px;padding:16px;margin:14px 0;text-align:left;"></div>
+      <div class="cloud" id="cloudStatus">⏳ Envoi...</div>
+      <div class="controls" style="margin-top:14px;">
+        <button class="btn ghost" id="retryBtn">Recommencer</button>
+      </div>
+    </div>
+  </div>
+  <footer>Outil pédagogique · <span class="seal">Seimei</span> · Sunagakure</footer>
+</div>
+
+<script>
+(function(){
+var el=function(id){return document.getElementById(id);};
+var SVG_NS='http://www.w3.org/2000/svg';
+
+var POOL=["Fracture costale","Hématome hépatique","Fracture du poignet","Hémorragie interne",
+  "Contusion pulmonaire","Traumatisme crânien léger","Fracture de la clavicule","Perforation intestinale",
+  "Fracture du tibia","Entorse de cheville","Contusion rénale","Déchirure musculaire"];
+
+var CASES=[
+  {name:"Patient — chute d'un toit",injuries:[
+    {q:"Zone thoracique droite",cx:95,cy:113,r:14,ans:"Fracture costale"},
+    {q:"Zone abdominale droite",cx:98,cy:152,r:14,ans:"Hématome hépatique"},
+    {q:"Avant-bras droit",cx:132,cy:160,r:11,ans:"Fracture du poignet"}
+  ]},
+  {name:"Patient — combat rapproché",injuries:[
+    {q:"Zone abdominale gauche",cx:60,cy:150,r:14,ans:"Hémorragie interne"},
+    {q:"Zone thoracique gauche",cx:65,cy:112,r:14,ans:"Contusion pulmonaire"},
+    {q:"Zone crânienne",cx:80,cy:26,r:14,ans:"Traumatisme crânien léger"}
+  ]},
+  {name:"Patient — explosion de sable",injuries:[
+    {q:"Épaule droite",cx:112,cy:96,r:11,ans:"Fracture de la clavicule"},
+    {q:"Zone abdominale centrale",cx:80,cy:158,r:14,ans:"Perforation intestinale"},
+    {q:"Jambe gauche",cx:54,cy:270,r:11,ans:"Fracture du tibia"}
+  ]},
+  {name:"Patient — chute dans un ravin",injuries:[
+    {q:"Cheville droite",cx:108,cy:295,r:11,ans:"Entorse de cheville"},
+    {q:"Flanc droit",cx:100,cy:158,r:14,ans:"Contusion rénale"},
+    {q:"Cuisse gauche",cx:56,cy:240,r:12,ans:"Déchirure musculaire"}
+  ]},
+  {name:"Patient — écrasé sous des décombres",injuries:[
+    {q:"Zone thoracique",cx:80,cy:113,r:15,ans:"Fracture costale"},
+    {q:"Zone abdominale",cx:70,cy:152,r:14,ans:"Hémorragie interne"},
+    {q:"Jambe droite",cx:106,cy:270,r:11,ans:"Fracture du tibia"}
+  ]}
+];
+
+var REVEAL_MS=1000, SCAN_RADIUS=24, SCAN_SECONDS=18, DIAG_SECONDS=7;
+
+var idx=0,playerName='',caseResults=[];
+var injuries=[],revealedOrder=[],foundCount=0,mousePt=null,animId=null,lastT=0,scanActive=false;
+var scanTimerHandle=null,scanTimerInterval=null,diagTimerHandle=null,diagTimerInterval=null;
+var diagIdx=0,diagCorrect=0,diagAnswered=false;
+
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+
+function buildBody(){
+  var svg=el('bodySvg');
+  svg.innerHTML='';
+  function line(x1,y1,x2,y2){var l=document.createElementNS(SVG_NS,'line');l.setAttribute('x1',x1);l.setAttribute('y1',y1);l.setAttribute('x2',x2);l.setAttribute('y2',y2);l.setAttribute('stroke','rgba(240,223,184,.35)');l.setAttribute('stroke-width','2');svg.appendChild(l);}
+  function circle(cx,cy,r){var c=document.createElementNS(SVG_NS,'circle');c.setAttribute('cx',cx);c.setAttribute('cy',cy);c.setAttribute('r',r);c.setAttribute('fill','none');c.setAttribute('stroke','rgba(240,223,184,.35)');c.setAttribute('stroke-width','2');svg.appendChild(c);}
+  function path(d){var p=document.createElementNS(SVG_NS,'path');p.setAttribute('d',d);p.setAttribute('fill','none');p.setAttribute('stroke','rgba(240,223,184,.35)');p.setAttribute('stroke-width','2');svg.appendChild(p);}
+  circle(80,30,22);
+  line(80,52,80,90);
+  path('M50 95 Q80 78 110 95 L118 190 Q80 205 42 190 Z');
+  line(50,100,18,175);
+  line(110,100,142,175);
+  line(60,205,52,300);
+  line(100,205,108,300);
+
+  var reticle=document.createElementNS(SVG_NS,'circle');
+  reticle.setAttribute('id','scanReticle');
+  reticle.setAttribute('r',SCAN_RADIUS);
+  reticle.setAttribute('fill','rgba(111,207,151,.14)');
+  reticle.setAttribute('stroke','rgba(61,220,132,.55)');
+  reticle.setAttribute('stroke-width','1.5');
+  reticle.style.pointerEvents='none';
+  reticle.style.display='none';
+  svg.appendChild(reticle);
+}
+
+function startGame(){
+  var nm=el('nameInput').value.trim();
+  if(!nm){el('nameInput').style.borderColor='var(--blood-light)';
+    setTimeout(function(){el('nameInput').style.borderColor='';},900);return;}
+  playerName=nm; idx=0; caseResults=[];
+  el('intro').style.display='none'; el('result').style.display='none';
+  el('game').style.display='block';
+  buildBody();
+  bindScanEvents();
+  loadCase();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function loadCase(){
+  var c=CASES[idx];
+  el('caseCount').textContent='Cas '+(idx+1)+'/'+CASES.length;
+  el('patientLine').textContent=c.name;
+  el('phaseTag').textContent='Phase de scan';
+  el('scanPhase').style.display='';
+  el('diagPhase').style.display='none';
+  el('feedback').className='feedback';el('feedback').textContent='';
+
+  injuries=c.injuries.map(function(inj){
+    return {q:inj.q,cx:inj.cx,cy:inj.cy,r:inj.r,ans:inj.ans,progress:0,revealed:false,el:null};
+  });
+  revealedOrder=[];foundCount=0;
+  el('foundTally').textContent='0 / '+injuries.length+' blessure(s) détectée(s)';
+
+  var svg=el('bodySvg');
+  var old=svg.querySelectorAll('.injury-mark');
+  old.forEach(function(n){n.remove();});
+  injuries.forEach(function(inj){
+    var c2=document.createElementNS(SVG_NS,'circle');
+    c2.setAttribute('cx',inj.cx);c2.setAttribute('cy',inj.cy);c2.setAttribute('r',inj.r);
+    c2.setAttribute('class','injury-mark');
+    c2.setAttribute('fill','rgba(196,69,58,0)');
+    c2.setAttribute('stroke','rgba(196,69,58,0)');
+    c2.setAttribute('stroke-width','2');
+    svg.appendChild(c2);
+    inj.el=c2;
+  });
+
+  scanActive=true;
+  lastT=performance.now();
+  if(animId)cancelAnimationFrame(animId);
+  animId=requestAnimationFrame(scanLoop);
+
+  runScanTimer(SCAN_SECONDS,function(){
+    scanActive=false;
+    startDiagPhase();
+  });
+}
+
+function bindScanEvents(){
+  var svg=el('bodySvg');
+  function point(e){
+    var cx=(e.touches&&e.touches[0])?e.touches[0].clientX:e.clientX;
+    var cy=(e.touches&&e.touches[0])?e.touches[0].clientY:e.clientY;
+    var pt=svg.createSVGPoint();
+    pt.x=cx;pt.y=cy;
+    var ctm=svg.getScreenCTM();
+    if(!ctm)return null;
+    var loc=pt.matrixTransform(ctm.inverse());
+    return {x:loc.x,y:loc.y};
+  }
+  function move(e){
+    if(!scanActive)return;
+    var p=point(e);
+    if(!p)return;
+    mousePt=p;
+    var ret=el('scanReticle');
+    if(ret){ret.style.display='';ret.setAttribute('cx',p.x);ret.setAttribute('cy',p.y);}
+    e.preventDefault();
+  }
+  function leave(){ mousePt=null; var ret=el('scanReticle'); if(ret)ret.style.display='none'; }
+  svg.addEventListener('mousemove',move);
+  svg.addEventListener('touchmove',move,{passive:false});
+  svg.addEventListener('mouseleave',leave);
+  svg.addEventListener('touchend',leave);
+}
+
+function scanLoop(t){
+  var dt=t-lastT; lastT=t;
+  if(scanActive && mousePt){
+    injuries.forEach(function(inj){
+      if(inj.revealed)return;
+      var dx=mousePt.x-inj.cx, dy=mousePt.y-inj.cy;
+      var dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<=SCAN_RADIUS+inj.r){
+        inj.progress=Math.min(REVEAL_MS,inj.progress+dt);
+        var ratio=inj.progress/REVEAL_MS;
+        inj.el.setAttribute('fill','rgba(196,69,58,'+(ratio*0.55).toFixed(2)+')');
+        inj.el.setAttribute('stroke','rgba(196,69,58,'+(ratio*0.9).toFixed(2)+')');
+        if(inj.progress>=REVEAL_MS && !inj.revealed){
+          inj.revealed=true;
+          inj.el.classList.add('revealed-mark');
+          revealedOrder.push(inj);
+          foundCount++;
+          el('foundTally').textContent=foundCount+' / '+injuries.length+' blessure(s) détectée(s)';
+          if(foundCount>=injuries.length){
+            scanActive=false;
+            clearScanTimer();
+            setTimeout(startDiagPhase,400);
+          }
+        }
+      }
+    });
+  }
+  if(scanActive) animId=requestAnimationFrame(scanLoop);
+}
+
+function runScanTimer(seconds,onExpire){
+  clearScanTimer();
+  var fill=el('scanTimerFill');
+  fill.style.transition='none';fill.style.width='100%';fill.className='timer-fill';
+  void fill.offsetWidth;
+  fill.style.transition='width '+seconds+'s linear';
+  fill.style.width='0%';
+  var remaining=seconds;
+  scanTimerInterval=setInterval(function(){
+    remaining--;
+    if(remaining<=4)fill.className='timer-fill danger';
+    if(remaining<=0)clearInterval(scanTimerInterval);
+  },1000);
+  scanTimerHandle=setTimeout(function(){clearScanTimer();onExpire();},seconds*1000);
+}
+function clearScanTimer(){if(scanTimerHandle)clearTimeout(scanTimerHandle);if(scanTimerInterval)clearInterval(scanTimerInterval);}
+
+function startDiagPhase(){
+  if(animId)cancelAnimationFrame(animId);
+  el('phaseTag').textContent='Phase de diagnostic';
+  el('scanPhase').style.display='none';
+  el('diagPhase').style.display='';
+  diagIdx=0;diagCorrect=0;
+  loadDiagQuestion();
+}
+
+function loadDiagQuestion(){
+  if(diagIdx>=revealedOrder.length){ finishCaseDiag(); return; }
+  var inj=revealedOrder[diagIdx];
+  diagAnswered=false;
+  el('diagZoneLbl').textContent=inj.q;
+  el('diagQ').textContent='Quel est le problème détecté ici ?';
+  el('feedback').className='feedback';el('feedback').textContent='';
+
+  var distractPool=POOL.filter(function(p){return p!==inj.ans;});
+  var picks=shuffle(distractPool).slice(0,2);
+  var opts=shuffle([inj.ans].concat(picks));
+
+  var box=el('diagChoices'); box.innerHTML='';
+  opts.forEach(function(o){
+    var btn=document.createElement('button');
+    btn.className='choice'; btn.textContent=o;
+    btn.addEventListener('click',function(){ if(!diagAnswered) onDiagAnswer(o,inj); });
+    box.appendChild(btn);
+  });
+  runDiagTimer(DIAG_SECONDS,function(){ if(!diagAnswered) onDiagAnswer(null,inj); });
+}
+
+function runDiagTimer(seconds,onExpire){
+  clearDiagTimer();
+  var fill=el('diagTimerFill');
+  fill.style.transition='none';fill.style.width='100%';fill.className='timer-fill';
+  void fill.offsetWidth;
+  fill.style.transition='width '+seconds+'s linear';
+  fill.style.width='0%';
+  diagTimerHandle=setTimeout(function(){clearDiagTimer();onExpire();},seconds*1000);
+}
+function clearDiagTimer(){if(diagTimerHandle)clearTimeout(diagTimerHandle);if(diagTimerInterval)clearInterval(diagTimerInterval);}
+
+function onDiagAnswer(chosen,inj){
+  diagAnswered=true; clearDiagTimer();
+  var ok=chosen===inj.ans;
+  if(ok)diagCorrect++;
+  inj.diagCorrect=ok;
+  var btns=el('diagChoices').children;
+  for(var i=0;i<btns.length;i++){
+    var b=btns[i]; b.classList.add('dis');
+    if(b.textContent===inj.ans)b.classList.add('correct');
+    else if(b.textContent===chosen)b.classList.add('wrong');
+  }
+  var fb=el('feedback');
+  fb.className='feedback '+(ok?'ok':'no');
+  fb.textContent=ok?'✔ Diagnostic correct.':(chosen?'✘ Mauvais diagnostic.':'✘ Trop lent — diagnostic non posé.');
+  setTimeout(function(){ diagIdx++; loadDiagQuestion(); },1200);
+}
+
+function finishCaseDiag(){
+  caseResults.push({
+    name:CASES[idx].name,
+    total:injuries.length,
+    found:foundCount,
+    diagCorrect:diagCorrect
+  });
+  idx++;
+  if(idx>=CASES.length){ finish(); return; }
+  loadCase();
+}
+
+function finish(){
+  var totalInjuries=0,totalFound=0,totalDiag=0;
+  caseResults.forEach(function(r){ totalInjuries+=r.total; totalFound+=r.found; totalDiag+=r.diagCorrect; });
+  var denom=totalInjuries*2;
+  var num=totalFound+totalDiag;
+  var pct=denom?Math.round(num/denom*100):0;
+  var g=gradeFor(pct);
+  el('gradeLetter').textContent=g.l; el('gradeLetter').className='grade '+g.cls;
+  el('verdict').textContent=g.txt;
+  var box=el('reportBox'); box.innerHTML='';
+  addRow(box,'Apprenti',playerName);
+  caseResults.forEach(function(r){
+    addRow(box,r.name,r.found+'/'+r.total+' trouvées · '+r.diagCorrect+'/'+r.total+' diagnostiquées');
+  });
+  addRow(box,'SCORE',num+' / '+denom);
+  save({name:playerName,correct:num,total:denom,score:pct,grade:g.l});
+  el('game').style.display='none'; el('result').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function addRow(p,k,v){var d=document.createElement('div');d.className='rrow';
+  d.innerHTML='<span class="k">'+k+'</span><span class="v">'+v+'</span>';p.appendChild(d);}
+
+function gradeFor(s){
+  if(s>=90)return {l:"S",cls:"s",txt:"Diagnostic chakra irréprochable, aucune blessure cachée n'a échappé au scan."};
+  if(s>=60)return {l:"B",cls:"b",txt:"Bon niveau, quelques zones mal scannées ou mal diagnostiquées."};
+  return {l:"D",cls:"f",txt:"Trop de blessures manquées ou mal identifiées. Revois la technique de diagnostic."};
+}
+
+function save(row){
+  var note=el('cloudStatus');
+  var URL=(typeof SUPABASE_URL!=='undefined')?SUPABASE_URL:null;
+  var KEY=(typeof SUPABASE_KEY!=='undefined')?SUPABASE_KEY:null;
+  if(!URL||!KEY){note.textContent="⚠ Mode hors-ligne.";note.className="cloud warn";return;}
+  note.textContent="⏳ Envoi..."; note.className="cloud";
+  try{
+    var sb=window.supabase.createClient(URL,KEY);
+    sb.from('kaiseki_scores').insert([row]).then(function(res){
+      if(res.error){note.textContent="⚠ Erreur : "+res.error.message;note.className="cloud warn";}
+      else{note.textContent="✓ Score transmis.";note.className="cloud ok";}
+    },function(){note.textContent="⚠ Erreur réseau.";note.className="cloud warn";});
+  }catch(e){note.textContent="⚠ Erreur.";note.className="cloud warn";}
+}
+
+el('startBtn').addEventListener('click',startGame);
+el('nameInput').addEventListener('keydown',function(e){if(e.key==='Enter')startGame();});
+el('retryBtn').addEventListener('click',startGame);
+})();
+</script>
+</body>
+</html>
