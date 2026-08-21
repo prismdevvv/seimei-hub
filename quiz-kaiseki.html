@@ -47,6 +47,8 @@
 @keyframes lensSpin{to{transform:rotate(360deg);}}
 .crack-mark{animation:crackPulse 1s ease-in-out infinite;transform-box:fill-box;transform-origin:center;}
 @keyframes crackPulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+.pulse-ring{animation:pulseRingAnim 1.4s ease-out infinite;transform-box:fill-box;transform-origin:center;}
+@keyframes pulseRingAnim{0%{transform:scale(.55);opacity:.85;}100%{transform:scale(2);opacity:0;}}
 .miss-x{pointer-events:none;animation:missFade .55s ease-out forwards;}
 @keyframes missFade{from{opacity:1;transform:scale(.7);}to{opacity:0;transform:scale(1.3);}}
 .found-flash{pointer-events:none;fill:none;stroke:#3ddc84;stroke-width:2;animation:foundPing .7s ease-out forwards;}
@@ -71,8 +73,8 @@
   <div id="intro">
     <div class="panel">
       <h2>Briefing</h2>
-      <p class="lead">Le <strong>Kaiseki no Jutsu</strong> transforme ton chakra en un véritable scanner. Passe ta main au-dessus du corps du patient : la zone sous ton chakra devient transparente et révèle le squelette en dessous.</p>
-      <p class="hint" style="margin-top:8px;">🖐 Balaie tout le corps pour chercher l'os cassé à travers ta fenêtre de chakra, puis clique dessus dès que tu le vois pour confirmer le diagnostic — avant la fin du chrono.</p>
+      <p class="lead">Le <strong>Kaiseki no Jutsu</strong> transforme ton chakra en un véritable scanner. Passe ta main au-dessus du corps du patient : la zone sous ton chakra devient transparente et révèle l'intérieur du corps en dessous.</p>
+      <p class="hint" style="margin-top:8px;">🖐 Balaie tout le corps pour chercher l'anomalie à travers ta fenêtre de chakra — fracture, luxation, hémorragie ou corps étranger — puis clique dessus dès que tu la vois pour confirmer le diagnostic, avant la fin du chrono.</p>
     </div>
     <div class="panel">
       <h2>Identification</h2>
@@ -95,12 +97,12 @@
       <div class="patient-line" id="patientLine"></div>
 
       <div id="scanPhase">
-        <div class="status-line" id="statusLine">Cherche la fracture...</div>
+        <div class="status-line" id="statusLine">Cherche l'anomalie...</div>
         <div class="timer-track"><div class="timer-fill" id="scanTimerFill"></div></div>
         <div class="scan-area" id="scanArea">
           <svg id="bodySvg" viewBox="0 0 160 340" xmlns="http://www.w3.org/2000/svg"></svg>
         </div>
-        <div class="instr">Passe ton curseur sur le corps pour ouvrir la fenêtre de chakra, repère l'os cassé, puis clique dessus.</div>
+        <div class="instr">Passe ton curseur sur le corps pour ouvrir la fenêtre de chakra, repère l'anomalie, puis clique dessus.</div>
       </div>
 
       <div id="diagPhase" style="display:none;">
@@ -109,7 +111,7 @@
           <div class="q-icon" id="diagIcon"></div>
           <div class="q-body">
             <div class="q-label" id="diagZoneLbl">Zone</div>
-            <div class="q-text" id="diagQ">Quel os est fracturé ici ?</div>
+            <div class="q-text" id="diagQ">Quel est le problème détecté ici ?</div>
             <div id="diagChoices"></div>
           </div>
         </div>
@@ -140,13 +142,35 @@ var el=function(id){return document.getElementById(id);};
 var SVG_NS='http://www.w3.org/2000/svg';
 
 var CASES=[
-  {name:"Patient — chute d'un toit",q:"Cage thoracique droite",cx:97,cy:112,ans:"Fracture costale",part:"rib"},
-  {name:"Patient — combat rapproché",q:"Crâne",cx:80,cy:24,ans:"Fracture du crâne",part:"skull"},
-  {name:"Patient — explosion de sable",q:"Clavicule droite",cx:104,cy:66,ans:"Fracture de la clavicule",part:"clavicle"},
-  {name:"Patient — chute dans un ravin",q:"Tibia droit",cx:104,cy:255,ans:"Fracture du tibia",part:"leg"},
-  {name:"Patient — écrasé sous des décombres",q:"Poignet gauche",cx:24,cy:158,ans:"Fracture du poignet",part:"arm"}
+  {name:"Patient — chute d'un toit",q:"Cage thoracique droite",cx:97,cy:112,ans:"Fracture costale",type:"os"},
+  {name:"Patient — combat rapproché",q:"Épaule gauche",cx:58,cy:70,ans:"Luxation de l'épaule",type:"luxation"},
+  {name:"Patient — explosion de sable",q:"Cuisse gauche",cx:56,cy:235,ans:"Corps étranger (éclat de métal)",type:"corps_etranger"},
+  {name:"Patient — chute dans un ravin",q:"Zone abdominale",cx:80,cy:158,ans:"Hémorragie interne",type:"interne"},
+  {name:"Patient — écrasé sous des décombres",q:"Tibia droit",cx:104,cy:255,ans:"Fracture du tibia",type:"os"}
 ];
-var POOL=CASES.map(function(c){return c.ans;});
+var POOL=CASES.map(function(c){return c.ans;}).concat(["Fracture du crâne","Luxation du genou","Fracture du poignet"]);
+
+/* ---------- icon markup by anomaly type ---------- */
+function iconMarkup(type){
+  if(type==='luxation'){
+    return '<circle cx="6" cy="4" r="7" fill="none" stroke="#9fb3c8" stroke-width="1.6" stroke-dasharray="2.5 2.5"/>'+
+      '<circle cx="-8" cy="-5" r="6" fill="#efe3c4" stroke="#8a4f1a" stroke-width="1"/>'+
+      '<path d="M-3 -1 L4 2" stroke="#ff6b4a" stroke-width="2" stroke-linecap="round" stroke-dasharray="1 2.4"/>';
+  }
+  if(type==='interne'){
+    return '<circle r="11" fill="rgba(154,40,32,.5)"/>'+
+      '<circle class="pulse-ring" r="11" fill="none" stroke="rgba(196,69,58,.7)" stroke-width="1.6"/>'+
+      '<circle r="5.5" fill="rgba(220,80,65,.95)"/>';
+  }
+  if(type==='corps_etranger'){
+    return '<path d="M0 -9 L3 -2 L10 -1 L4 4 L6 11 L0 6 L-6 11 L-4 4 L-10 -1 L-3 -2 Z" fill="#dff0ff" stroke="#7fa8c9" stroke-width="1"/>'+
+      '<circle r="2" fill="#ffffff" opacity=".85"/>';
+  }
+  return '<ellipse cx="-9" cy="0" rx="5.5" ry="4.5" fill="#efe3c4" stroke="#8a4f1a" stroke-width="1"/>'+
+    '<ellipse cx="9" cy="0" rx="5.5" ry="4.5" fill="#efe3c4" stroke="#8a4f1a" stroke-width="1"/>'+
+    '<rect x="-9" y="-3.4" width="18" height="6.8" fill="#efe3c4" stroke="#8a4f1a" stroke-width="1"/>'+
+    '<path d="M-4 -4.5 L0 -0.5 L-3 1.5 L2 5" stroke="#9a2820" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
+}
 
 var LENS_R=26, SCAN_SECONDS=16, DIAG_SECONDS=7, HIT_TOL=15;
 
@@ -291,7 +315,7 @@ function loadCase(){
   el('diagPhase').style.display='none';
   el('feedback').className='feedback';el('feedback').textContent='';
   el('statusLine').className='status-line';
-  el('statusLine').textContent='Cherche la fracture...';
+  el('statusLine').textContent="Cherche l'anomalie...";
 
   var hole=el('maskHole');
   if(hole){hole.setAttribute('r',LENS_R*1.35);hole.setAttribute('cx',-100);hole.setAttribute('cy',-100);}
@@ -302,8 +326,7 @@ function loadCase(){
   var g=document.createElementNS(SVG_NS,'g');
   g.setAttribute('class','crack-mark');
   g.setAttribute('transform','translate('+c.cx+','+c.cy+')');
-  g.innerHTML='<path d="M-7 -8 L-1 -1 L-6 3 L2 6 L-2 13" stroke="#ff6b4a" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'+
-    '<path d="M-7 -8 L-1 -1 L-6 3 L2 6 L-2 13" stroke="#ff6b4a" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".25"/>';
+  g.innerHTML=iconMarkup(c.type);
   window.__xrayLayer.appendChild(g);
   currentCrackEl=g;
 
@@ -384,7 +407,7 @@ function onFound(c){
   found=true; scanActive=false; clearScanTimer();
   spawnFoundRing(c.cx,c.cy);
   el('statusLine').className='status-line ok';
-  el('statusLine').textContent='✔ Fracture localisée !';
+  el('statusLine').textContent='✔ Anomalie localisée !';
   var hole=el('maskHole'); if(hole){hole.setAttribute('r',200);}
   setTimeout(function(){ startDiag(c,true); },900);
 }
@@ -430,8 +453,8 @@ function startDiag(c,wasFound){
   el('feedback').className='feedback';el('feedback').textContent='';
   diagAnswered=false;
   el('diagZoneLbl').textContent=c.q;
-  el('diagQ').textContent='Quel os est fracturé ici ?';
-  el('diagIcon').innerHTML='<svg viewBox="-15 -15 30 30"><path d="M-7 -8 L-1 -1 L-6 3 L2 6 L-2 13" stroke="#ff6b4a" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  el('diagQ').textContent='Quel est le problème détecté ici ?';
+  el('diagIcon').innerHTML='<svg viewBox="-15 -15 30 30">'+iconMarkup(c.type)+'</svg>';
 
   var distractPool=POOL.filter(function(p){return p!==c.ans;});
   var picks=shuffle(distractPool).slice(0,2);
@@ -503,9 +526,9 @@ function addRow(p,k,v){var d=document.createElement('div');d.className='rrow';
   d.innerHTML='<span class="k">'+k+'</span><span class="v">'+v+'</span>';p.appendChild(d);}
 
 function gradeFor(s){
-  if(s>=90)return {l:"S",cls:"s",txt:"Scan chakra parfait, chaque fracture repérée et identifiée sans hésiter."};
-  if(s>=60)return {l:"B",cls:"b",txt:"Bon niveau, quelques fractures manquées ou mal identifiées."};
-  return {l:"D",cls:"f",txt:"Trop de fractures manquées. Balaie plus lentement tout le corps la prochaine fois."};
+  if(s>=90)return {l:"S",cls:"s",txt:"Scan chakra parfait, chaque anomalie repérée et identifiée sans hésiter."};
+  if(s>=60)return {l:"B",cls:"b",txt:"Bon niveau, quelques anomalies manquées ou mal identifiées."};
+  return {l:"D",cls:"f",txt:"Trop d'anomalies manquées. Balaie plus lentement tout le corps la prochaine fois."};
 }
 
 function save(row){
